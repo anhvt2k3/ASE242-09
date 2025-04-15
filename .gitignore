@@ -1,0 +1,42 @@
+# ⚙️ Node dependencies
+/node_modules/
+
+# 🏗 Build output
+/build/
+dist/
+
+# 📄 Misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ✅ Testing
+/coverage/
+
+# 📦 Package manager locks
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 🖼 IDE settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# 🗂 Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ⚛️ React specific
+*.env.*.local
+
+# 🧪 Misc config backups
+*.bak
+*.orig
