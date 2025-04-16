@@ -20,19 +20,19 @@ export default function AuthPage() {
   }
   
   return (
-    <div className="min-h-screen flex md:items-center justify-center p-4 md:p-6 bg-gradient-to-br from-primary-50 to-neutral-100">
+    <div className="min-h-screen flex md:items-center justify-center p-1 bg-gradient-to-br from-primary-50 to-neutral-100">
       <div className="flex w-full max-w-5xl flex-col md:flex-row bg-white rounded-lg shadow-xl overflow-hidden">
-        <div className="md:w-1/2 p-8 flex items-center justify-center">
-          <AuthForm />
-        </div>
-        
-        <div className="md:w-1/2 bg-primary p-8 text-white flex flex-col justify-center">
+        <div className="md:w-1/2 p-3 text-black flex flex-col justify-center">
           <div className="max-w-md mx-auto">
-            <h2 className="text-3xl font-bold mb-4">Welcome to ArticleSpace</h2>
-            <p className="mb-6">
-              A platform for writers, thinkers, and creators to share their ideas with the world.
+            <h2 className="text-3xl font-bold mb-4">Welcome to ROMS - Room Management Service.</h2>
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/HCMUT_official_logo.png/1188px-HCMUT_official_logo.png"
+              className="w-32 h-auto mx-auto block pb-5 pt-5" 
+              />
+            <p className="align-middle text-center mb-6"> Ho Chi Minh University of Technology.
             </p>
             
+            {/*
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0 p-1 bg-white/10 rounded mr-3">
@@ -69,8 +69,12 @@ export default function AuthPage() {
                   <p className="text-sm text-white/80">Your data is secure and your privacy is respected.</p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
+        </div>
+      
+        <div className="md:w-1/2 p-3 flex items-center justify-center">
+          <AuthForm />
         </div>
       </div>
     </div>

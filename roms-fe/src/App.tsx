@@ -10,6 +10,13 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={AuthPage} />
+      
+      {/* Insert Schedule Listing Page here. *change AuthPage()* */}
+      <Route path="/schedules" component={AuthPage} />
+      
+      {/* Insert Schedule Create here. *change AuthPage()* */}
+      <Route path="/schedule-create" component={AuthPage} />
+
       <Route component={NotFound} />
     </Switch>
   );

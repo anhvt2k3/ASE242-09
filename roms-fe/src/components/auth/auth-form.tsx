@@ -87,8 +87,8 @@ export function AuthForm() {
   return (
     <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 md:p-8">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-primary mb-2">ArticleSpace</h1>
-        <p className="text-muted-foreground">Share your thoughts with the world</p>
+        <h1 className="text-3xl font-bold text-primary mb-2">ROMS</h1>
+        <p className="text-muted-foreground">HCMUT Central portal for lecture schedules.</p>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
