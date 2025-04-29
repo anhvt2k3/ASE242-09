@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
+import BookingPage from "@/pages/booking-page"; // Import BookingPage
 import { AuthProvider } from "./hooks/use-auth";
 
 function Router() {
@@ -11,6 +12,9 @@ function Router() {
     <Switch>
       <Route path="/" component={AuthPage} />
       
+      {/* Booking Page Route */}
+      <Route path="/booking" component={BookingPage} />
+
       {/* Insert Schedule Listing Page here. *change AuthPage()* */}
       <Route path="/schedules" component={AuthPage} />
       
