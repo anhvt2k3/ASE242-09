@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { DatePicker, Modal } from "antd";
+import { useState, useEffect } from "react";
+import { DatePicker, Modal, AutoComplete } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
@@ -13,9 +13,14 @@ export default function BookingPage() {
   const [description, setDescription] = useState("");
   const [autoToggle, setAutoToggle] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [suggestions, setSuggestions] = useState<{ value: string }[]>([]);
 
-  // Mocked unavailable slots
-  const unavailableSlots = [3, 4, 10]; // giả bộ tiết này được đặt
+
+  // giả bộ tiết này đã được chọn
+  const unavailableSlots = [3, 4, 10];
+
+  // auto suggest
+  const courseCodeOptions = ["CO2001", "CO2002", "CO3001", "CO3002", "IM1013"]; //giả bộ
 
   const handleSlotClick = (slot: number) => {
     if (unavailableSlots.includes(slot)) return; // kh cho đki những chỗ chọn rồi
@@ -26,15 +31,15 @@ export default function BookingPage() {
 
   const handleConfirmClick = () => {
     if (!date || selectedSlots.length === 0 || !courseCode.trim() || !courseName.trim()) {
-      alert("Vui lòng điền đầy đủ thông tin và chọn ít nhất một tiết.");
+      alert("Please fill in all required fields.");
       return;
     }
-    setIsModalVisible(true); // show modal xác nhận
+    setIsModalVisible(true);
   };
 
   const handleFinalConfirm = () => {
     setIsModalVisible(false);
-    alert("Đặt phòng thành công!");
+    alert("Room booking successful!");
     resetForm();
   };
 
@@ -47,6 +52,18 @@ export default function BookingPage() {
     setAutoToggle(false);
   };
 
+    // Suggestion logic
+    useEffect(() => {
+      if (courseCode.trim() === "") {
+        setSuggestions([]);
+        return;
+      }
+      const filteredSuggestions = courseCodeOptions
+        .filter((code) => code.toLowerCase().includes(courseCode.toLowerCase()))
+        .map((code) => ({ value: code }));
+      setSuggestions(filteredSuggestions);
+    }, [courseCode]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 p-4 flex items-center justify-center">
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-md p-6 md:p-8 space-y-6">
@@ -54,19 +71,19 @@ export default function BookingPage() {
           Room Booking
         </h1>
 
-        {/* Room Info */}
+        {/* room info */}
         <div className="border p-4 rounded-lg bg-blue-50">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">Room Information</h2>
           <p className="text-gray-700">{room}</p>
         </div>
 
-        {/* Date Selection */}
+        {/* chon date */}
         <div className="border p-4 rounded-lg space-y-4">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">Booking Date</h2>
           <DatePicker className="w-full" value={date} onChange={setDate} />
         </div>
 
-        {/* Slot Selection */}
+        {/* chon slot */}
         <div className="border p-4 rounded-lg space-y-4">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">Select Slots</h2>
           <div className="grid grid-cols-4 gap-2">
@@ -94,12 +111,12 @@ export default function BookingPage() {
           <h2 className="text-lg font-semibold text-gray-800">Course Details</h2>
           <div>
             <label className="block text-sm text-gray-700 mb-1">Course Code</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+            <AutoComplete
+              className="w-full"
+              options={suggestions}
               value={courseCode}
-              onChange={(e) => setCourseCode(e.target.value)}
-              placeholder="e.g., CS101"
+              onChange={(value) => setCourseCode(value)}
+              placeholder="e.g., CO2001"
             />
           </div>
           <div>
