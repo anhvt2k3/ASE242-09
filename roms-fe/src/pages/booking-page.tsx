@@ -15,15 +15,18 @@ export default function BookingPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [suggestions, setSuggestions] = useState<{ value: string }[]>([]);
 
-
-  // giả bộ tiết này đã được chọn
-  const unavailableSlots = [3, 4, 10];
-
-  // auto suggest
-  const courseCodeOptions = ["CO2001", "CO2002", "CO3001", "CO3002", "IM1013"]; //giả bộ
+  // gia bo cho dat r
+  const unavailableSlotsByDate: Record<string, number[]> = {
+    "2025-05-01": [3, 4, 10],
+    "2025-05-02": [1, 2, 5],
+    "2025-05-03": [6, 7, 8],
+  };
 
   const handleSlotClick = (slot: number) => {
-    if (unavailableSlots.includes(slot)) return; // kh cho đki những chỗ chọn rồi
+    if (!date) return;
+    const formattedDate = date.format("YYYY-MM-DD");
+    const unavailableSlots = unavailableSlotsByDate[formattedDate] || [];
+    if (unavailableSlots.includes(slot)) return; // kh cho dki slot da co nguoi dat
     setSelectedSlots((prev) =>
       prev.includes(slot) ? prev.filter((s) => s !== slot) : [...prev, slot]
     );
@@ -52,17 +55,23 @@ export default function BookingPage() {
     setAutoToggle(false);
   };
 
-    // Suggestion logic
-    useEffect(() => {
-      if (courseCode.trim() === "") {
-        setSuggestions([]);
-        return;
-      }
-      const filteredSuggestions = courseCodeOptions
-        .filter((code) => code.toLowerCase().includes(courseCode.toLowerCase()))
-        .map((code) => ({ value: code }));
-      setSuggestions(filteredSuggestions);
-    }, [courseCode]);
+  // Suggestion logic
+  useEffect(() => {
+    if (courseCode.trim() === "") {
+      setSuggestions([]);
+      return;
+    }
+    const filteredSuggestions = ["CO2001", "CO2002", "CO3001", "CO3002", "IM1013"]
+      .filter((code) => code.toLowerCase().includes(courseCode.toLowerCase()))
+      .map((code) => ({ value: code }));
+    setSuggestions(filteredSuggestions);
+  }, [courseCode]);
+
+  const getUnavailableSlots = () => {
+    if (!date) return [];
+    const formattedDate = date.format("YYYY-MM-DD");
+    return unavailableSlotsByDate[formattedDate] || [];
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 p-4 flex items-center justify-center">
@@ -91,14 +100,14 @@ export default function BookingPage() {
               <button
                 key={slot}
                 className={`px-3 py-2 rounded-md text-sm font-semibold ${
-                  unavailableSlots.includes(slot)
+                  getUnavailableSlots().includes(slot)
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : selectedSlots.includes(slot)
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-blue-100"
                 }`}
                 onClick={() => handleSlotClick(slot)}
-                disabled={unavailableSlots.includes(slot)}
+                disabled={getUnavailableSlots().includes(slot)}
               >
                 Tiết {slot}
               </button>
