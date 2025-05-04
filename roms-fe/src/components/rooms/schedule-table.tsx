@@ -1,11 +1,12 @@
 import { format, isSameDay, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 
 import { RoomWithSchedule, RoomFilters } from "@/types/rooms";
 import { TIME_SLOTS } from "@/lib/constants";
 import { getRoomScheduleForTimeAndDay } from "@/lib/room-utils";
+import { useAuth } from "@/hooks/use-auth";
 
 interface ScheduleTableProps {
   rooms?: RoomWithSchedule[];
@@ -14,6 +15,7 @@ interface ScheduleTableProps {
   weekDates: Date[];
   weekStart: Date;
   weekEnd: Date;
+  onBookRoom: (roomId: string, date: string) => void;
 }
 
 export function ScheduleTable({
@@ -22,7 +24,8 @@ export function ScheduleTable({
   filters,
   weekDates,
   weekStart,
-  weekEnd
+  weekEnd,
+  onBookRoom
 }: ScheduleTableProps) {
   return (
     <Card>
@@ -41,15 +44,14 @@ export function ScheduleTable({
           </div>
         ) : !rooms?.length ? (
           <div className="text-center p-12">
-            <h3 className="text-lg font-medium">No rooms found</h3>
-            <p className="text-muted-foreground">Try adjusting your filters</p>
+            <h3 className="text-lg text-muted-foreground font-medium">No schedule found</h3>
           </div>
         ) : (
           <div className="overflow-x-auto">
             {filters.period === "day" ? (
-              <DailyScheduleTable rooms={rooms} filters={filters} />
+              <DailyScheduleTable rooms={rooms} filters={filters} onBookRoom={onBookRoom}/>
             ) : (
-              <WeeklyScheduleTable rooms={rooms} weekDates={weekDates} />
+              <WeeklyScheduleTable rooms={rooms} weekDates={weekDates} onBookRoom={onBookRoom} />
             )}
           </div>
         )}
@@ -58,7 +60,17 @@ export function ScheduleTable({
   );
 }
 
-function DailyScheduleTable({ rooms, filters }: { rooms: RoomWithSchedule[], filters: RoomFilters }) {
+function DailyScheduleTable({ 
+  rooms, 
+  filters,
+  onBookRoom
+}: { 
+  rooms: RoomWithSchedule[], 
+  filters: RoomFilters,
+  onBookRoom: (roomId: string, date: string) => void
+}) {
+  const { user } = useAuth();
+
   return (
     <table className="w-full border-collapse">
       <thead>
@@ -121,7 +133,20 @@ function DailyScheduleTable({ rooms, filters }: { rooms: RoomWithSchedule[], fil
                         <span className="text-xs text-muted-foreground">{schedule.lecturer.name}</span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground text-xs">Available</span>
+                      user ? (
+                        <button
+                          onClick={() => onBookRoom(room.id, filters.date)}
+                          className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
+                        >
+                          <span className="text-green-600 text-xs font-medium group-hover:text-green-700">Available</span>
+                          <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                            <PlusCircle className="h-3 w-3 text-green-600" />
+                            <span className="text-green-600 text-xs">Book</span>
+                          </div>
+                        </button>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Available</span>
+                      )
                     )}
                   </td>
                 );
@@ -134,7 +159,17 @@ function DailyScheduleTable({ rooms, filters }: { rooms: RoomWithSchedule[], fil
   );
 }
 
-function WeeklyScheduleTable({ rooms, weekDates }: { rooms: RoomWithSchedule[], weekDates: Date[] }) {
+function WeeklyScheduleTable({ 
+  rooms, 
+  weekDates, 
+  onBookRoom 
+}: { 
+  rooms: RoomWithSchedule[], 
+  weekDates: Date[] ,
+  onBookRoom: (roomId: string, date: string) => void
+}) {
+  const { user } = useAuth();
+
   return (
     <table className="w-full border-collapse">
       <thead>
@@ -191,9 +226,22 @@ function WeeklyScheduleTable({ rooms, weekDates }: { rooms: RoomWithSchedule[], 
                         ))}
                       </div>
                     ) : (
+                      user ? (
+                        <button
+                          onClick={() => onBookRoom(room.id, dayStr)}
+                          className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
+                        >
+                          <span className="text-green-600 text-xs font-medium group-hover:text-green-700">Available</span>
+                          <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
+                            <PlusCircle className="h-3 w-3" />
+                            <span>Book</span>
+                          </div>
+                        </button>
+                      ) : (
                       <div className="text-center text-xs text-muted-foreground pt-4">
                         Available
                       </div>
+                    )
                     )}
                   </div>
                 </td>

@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Search, Calendar } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { BUILDINGS, ROOM_TYPES } from "@/lib/constants";
 import { RoomFilters } from "@/types/rooms";
@@ -38,7 +38,7 @@ export function FiltersPanel({
         <CardTitle>Filters</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Building Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Building</label>
@@ -97,7 +97,7 @@ export function FiltersPanel({
         </div>
         
         {/* Second row of filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
           {/* View Type (Day/Week) */}
           <div className="space-y-2">
             <label className="text-sm font-medium">View</label>
@@ -138,32 +138,59 @@ export function FiltersPanel({
             <label className="text-sm font-medium">Date</label>
             {filters.period === "day" ? (
               <div className="relative">
-                <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="date"
-                  className="pl-8"
+                  className="pl-3"
                   value={filters.date}
                   onChange={(e) => onFilterChange("date", e.target.value)}
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Button 
                   variant="outline" 
                   size="icon"
                   onClick={() => onNavigateWeek('prev')}
                 >
-                  &lt;
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke-width="1.5" 
+                    stroke="currentColor" 
+                    className="size-6"
+                  >
+                    <path 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      d="M15.75 19.5 8.25 12l7.5-7.5" 
+                    />
+                  </svg>
                 </Button>
-                <div className="px-2 py-1 border rounded-md flex-1 text-center text-sm">
+                
+                <div className="px-2 py-2 border rounded-md flex-1 text-center text-sm">
                   {format(weekStart, "MMM dd")} - {format(weekEnd, "MMM dd, yyyy")}
                 </div>
+
                 <Button 
                   variant="outline" 
                   size="icon"
                   onClick={() => onNavigateWeek('next')}
                 >
-                  &gt;
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke-width="1.5" 
+                    stroke="currentColor" 
+                    className="size-6"
+                  >
+                    <path 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      d="m8.25 4.5 7.5 7.5-7.5 7.5" 
+                    />
+                  </svg>
                 </Button>
               </div>
             )}
@@ -171,7 +198,7 @@ export function FiltersPanel({
           
           {/* My schedules filter (only for lecturers) */}
           {user && (
-            <div className="space-y-2 flex items-end">
+            <div className="space-y-2 flex items-end ml-2">
               <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="mySchedules" 

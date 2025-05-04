@@ -5,14 +5,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-
 import { RoomFilters } from "@/types/rooms"; 
 import { fetchRooms } from "@/lib/services";
 import { FiltersPanel } from "@/components/rooms/filters-panel";
 import { ScheduleTable } from "@/components/rooms/schedule-table";
-
 import { Navbar } from "@/components/layout/navbar";
-import { SideActions } from "@/components/layout/side-actions";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -25,8 +22,9 @@ export default function HomePage() {
     date: format(new Date(), "yyyy-MM-dd"),
     period: "week", 
     session: "all", 
-    lecturerId: user?.id || ""
+    lecturerId: ""
   });
+  
   
   const [showMySchedules, setShowMySchedules] = useState(false);
   
@@ -55,14 +53,19 @@ export default function HomePage() {
   const handleMySchedulesToggle = (checked: boolean) => {
     setShowMySchedules(checked);
     if (checked && user?.id) {
-      setFilters(prev => ({ ...prev, lecturerId: user.id }));
+      const userId = String(user.id);
+      setFilters(prev => ({ ...prev, lecturerId: userId }));
     } else {
       setFilters(prev => ({ ...prev, lecturerId: "" }));
     }
   };
   
-  const handleBookRoom = () => {
-    setLocation("/schedule-create");
+  const handleBookRoom = (roomId?: string, date?: string) => {
+    if (roomId && date) {
+      setLocation(`/schedule-create?roomId=${roomId}&date=${date}`);
+    } else {
+      setLocation("/schedule-create");
+    }
   };
   
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -71,12 +74,14 @@ export default function HomePage() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="container mx-auto py-6 max-w-7xl">
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Room Search</h1>
+          <h1 className="text-3xl font-bold ml-4">Room Schedules</h1>
           {user && (
-            <Button onClick={handleBookRoom} className="flex items-center gap-2">
+            <Button onClick={() => handleBookRoom()} className="flex items-center gap-2 mr-4">
               <PlusCircle className="h-4 w-4" />
               Book a Room
             </Button>
@@ -101,8 +106,10 @@ export default function HomePage() {
           weekDates={weekDates}
           weekStart={weekStart}
           weekEnd={weekEnd}
+          onBookRoom={handleBookRoom}
         />
       </div>
     </div>
+    </>
   );
 }

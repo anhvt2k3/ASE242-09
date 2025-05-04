@@ -18,8 +18,8 @@ export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule
         {
           id: "s1",
           roomId: "1",
-          startTime: "7:30",
-          endTime: "9:00",
+          startTime: "7:00",
+          endTime: "8:50",
           day: format(new Date(), "yyyy-MM-dd"),
           lecturerId: "l1",
           subject: "Computer Science",
@@ -28,8 +28,8 @@ export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule
         {
           id: "s2",
           roomId: "1",
-          startTime: "9:10",
-          endTime: "10:40",
+          startTime: "9:00",
+          endTime: "10:50",
           day: format(addDays(new Date(), 1), "yyyy-MM-dd"),
           lecturerId: "l2",
           subject: "Algorithms",
@@ -47,8 +47,8 @@ export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule
         {
           id: "s3",
           roomId: "2",
-          startTime: "12:50",
-          endTime: "14:20",
+          startTime: "13:00",
+          endTime: "14:50",
           day: format(new Date(), "yyyy-MM-dd"),
           lecturerId: "l3",
           subject: "Chemistry Lab",
