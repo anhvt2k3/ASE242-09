@@ -132,9 +132,9 @@ export function AuthForm() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      <a href="#" className="text-sm text-primary hover:text-primary/90">
+                      {/* <a href="#" className="text-sm text-primary hover:text-primary/90">
                         Forgot password?
-                      </a>
+                      </a> */}
                     </div>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
@@ -144,14 +144,14 @@ export function AuthForm() {
                 )}
               />
 
-              
               <label>
-                <input 
-                  type="checkbox" 
-                  checked={rememberMe} 
-                  onChange={() => setRememberMe(!rememberMe)} 
-                />
-                Remember Me
+              <input 
+                type="checkbox" 
+                checked={rememberMe} 
+                onChange={() => setRememberMe(!rememberMe)} 
+                className="mr-2 mt-2"
+              />
+              Remember me
               </label>
               
               <Button 
@@ -208,7 +208,11 @@ export function AuthForm() {
                   <FormItem>
                     <FormLabel>Display Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your name (optional)" {...field} />
+                    <Input
+                      placeholder="Your name (optional)"
+                      {...field}
+                      value={field.value ?? ''} // Ensure value is never null
+                    />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

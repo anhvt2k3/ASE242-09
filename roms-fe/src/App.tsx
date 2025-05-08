@@ -13,16 +13,12 @@ function Router() {
     <Switch>
       <Route path="/" component={AuthPage} />
       
+      <Route path="/auth" component={AuthPage} />
+      
       <Route path="/home" component={HomePage} />
 
       {/* Booking Page Route */}
       <Route path="/booking" component={BookingPage} />
-
-      {/* Insert Schedule Listing Page here. *change AuthPage()* */}
-      <Route path="/schedules" component={AuthPage} />
-      
-      {/* Insert Schedule Create here. *change AuthPage()* */}
-      <Route path="/schedule-create" component={AuthPage} />
 
       <Route component={NotFound} />
     </Switch>

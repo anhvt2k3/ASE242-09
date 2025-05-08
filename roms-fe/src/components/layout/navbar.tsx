@@ -15,7 +15,7 @@ export function Navbar() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="hover:opacity-80 transition-opacity">
-                <h1 className="text-xl font-bold text-primary cursor-pointer">ArticleSpace</h1>
+                <h1 className="text-xl font-bold text-primary cursor-pointer">ROMs</h1>
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-4">
