@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,18 +34,21 @@ const registerSchema = insertUserSchema.extend({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
+type LoginCreds = {username: string, password: string};
 
 export function AuthForm() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const { loginMutation, registerMutation, guestLoginMutation } = useAuth();
   const [_, navigate] = useLocation();
+  const [rememberedCreds, setRememberedCreds] = useState<LoginCreds>({username: localStorage.getItem('rememberedUsername')||"", password: localStorage.getItem('rememberedPassword')||""});
+  const [rememberMe, setRememberMe] = useState<boolean>(rememberedCreds.username!="" || rememberedCreds.password!="");
   
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: rememberedCreds.username,
+      password: rememberedCreds.password,
     },
   });
 
@@ -66,6 +69,14 @@ export function AuthForm() {
         navigate("/");
       },
     });
+
+    if (rememberMe) {
+      localStorage.setItem('rememberedUsername', data.username);
+      localStorage.setItem('rememberedPassword', data.password);
+    } else {
+      localStorage.removeItem('rememberedUsername');
+      localStorage.removeItem('rememberedPassword');
+    }
   };
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
@@ -132,6 +143,16 @@ export function AuthForm() {
                   </FormItem>
                 )}
               />
+
+              
+              <label>
+                <input 
+                  type="checkbox" 
+                  checked={rememberMe} 
+                  onChange={() => setRememberMe(!rememberMe)} 
+                />
+                Remember Me
+              </label>
               
               <Button 
                 type="submit" 

@@ -21,3 +21,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+*storybook.log
+
+../.vite/
+.storybook/
+plop-templates/
+plopfile.ts
+scripts/
+src/stories/
+vitest.workspace.ts

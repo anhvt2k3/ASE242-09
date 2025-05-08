@@ -22,7 +22,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex md:items-center justify-center p-1 bg-gradient-to-br from-primary-50 to-neutral-100">
       <div className="flex w-full max-w-5xl flex-col md:flex-row bg-white rounded-lg shadow-xl overflow-hidden">
-        <div className="md:w-1/2 p-3 text-black flex flex-col justify-center">
+        <div className="md:w-1/2 text-black flex flex-col justify-center">
           <div className="max-w-md mx-auto">
             <h2 className="text-3xl font-bold mb-4">Welcome to ROMS - Room Management Service.</h2>
             <img 
@@ -73,7 +73,7 @@ export default function AuthPage() {
           </div>
         </div>
       
-        <div className="md:w-1/2 p-3 flex items-center justify-center">
+        <div className="md:w-1/2 flex items-center justify-center">
           <AuthForm />
         </div>
       </div>
