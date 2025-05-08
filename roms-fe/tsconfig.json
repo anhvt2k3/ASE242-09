@@ -19,5 +19,8 @@
       "@/*": ["./src/*"],
       "@shared/*": ["./src/schema/*"]
     }
+  },
+  "ts-node": {
+    "esm": true
   }
 }

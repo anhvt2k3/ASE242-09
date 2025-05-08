@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
+import BookingPage from "@/pages/booking-page"; // Import BookingPage
 import { AuthProvider } from "./hooks/use-auth";
 
 function Router() {
@@ -14,7 +15,9 @@ function Router() {
       
       <Route path="/home" component={HomePage} />
 
-      
+      {/* Booking Page Route */}
+      <Route path="/booking" component={BookingPage} />
+
       {/* Insert Schedule Listing Page here. *change AuthPage()* */}
       <Route path="/schedules" component={AuthPage} />
       
