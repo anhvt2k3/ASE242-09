@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
+import HomePage from "@/pages/home-page";
 import BookingPage from "@/pages/booking-page"; // Import BookingPage
 import { AuthProvider } from "./hooks/use-auth";
 
@@ -12,6 +13,8 @@ function Router() {
     <Switch>
       <Route path="/" component={AuthPage} />
       
+      <Route path="/home" component={HomePage} />
+
       {/* Booking Page Route */}
       <Route path="/booking" component={BookingPage} />
 
