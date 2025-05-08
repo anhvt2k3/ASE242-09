@@ -62,9 +62,9 @@ export default function HomePage() {
   
   const handleBookRoom = (roomId?: string, date?: string) => {
     if (roomId && date) {
-      setLocation(`/schedule-create?roomId=${roomId}&date=${date}`);
+      setLocation(`/booking?roomId=${roomId}&date=${date}`);
     } else {
-      setLocation("/schedule-create");
+      setLocation("/booking");
     }
   };
   
