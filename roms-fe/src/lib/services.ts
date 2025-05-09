@@ -23,6 +23,7 @@ export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule
           day: format(new Date(), "yyyy-MM-dd"),
           lecturerId: "l1",
           subject: "Computer Science",
+          courseCode: "CO1011",
           lecturer: { id: "l1", name: "Dr. Nguyen Van A", department: "CS" }
         },
         {
@@ -33,6 +34,7 @@ export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule
           day: format(addDays(new Date(), 1), "yyyy-MM-dd"),
           lecturerId: "l2",
           subject: "Algorithms",
+          courseCode: "SP1012",
           lecturer: { id: "l2", name: "Dr. Tran Thi B", department: "CS" }
         }
       ]
@@ -52,6 +54,7 @@ export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule
           day: format(new Date(), "yyyy-MM-dd"),
           lecturerId: "l3",
           subject: "Chemistry Lab",
+          courseCode: "CH1003",
           lecturer: { id: "l3", name: "Dr. Le Van C", department: "Chemistry" }
         }
       ]

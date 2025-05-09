@@ -140,7 +140,7 @@ export function FiltersPanel({
               <div className="relative">
                 <Input
                   type="date"
-                  className="pl-3"
+                  className="pl-2"
                   value={filters.date}
                   onChange={(e) => onFilterChange("date", e.target.value)}
                 />
