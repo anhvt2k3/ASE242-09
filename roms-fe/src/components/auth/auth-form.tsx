@@ -132,9 +132,9 @@ export function AuthForm() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      {/* <a href="#" className="text-sm text-primary hover:text-primary/90">
+                      <a href="#" className="text-sm text-primary hover:text-primary/90">
                         Forgot password?
-                      </a> */}
+                      </a>
                     </div>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
