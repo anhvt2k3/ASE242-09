@@ -90,8 +90,12 @@ export function AuthForm() {
   const handleGuestLogin = () => {
     guestLoginMutation.mutate(undefined, {
       onSuccess: () => {
-        navigate("/"); // Redirect to an article
+        navigate("/home"); // Redirect to an article
       },
+      onError: () => {
+        // Handle error if needed
+        navigate("/home"); 
+      }
     });
   };
 
@@ -125,6 +129,7 @@ export function AuthForm() {
                 )}
               />
               
+              {/* # Add password format checker here */}
               <FormField
                 control={loginForm.control}
                 name="password"

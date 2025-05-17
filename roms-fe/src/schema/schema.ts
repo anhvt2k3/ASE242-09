@@ -1,5 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 /*
 2. **Answer**:
@@ -57,7 +57,7 @@ export const users = pgTable("users", {
   role: text("role").default("guest").notNull(),
   // avatarUrl: text("avatar_url"),
   // bio: text("bio"),
-  // isAdmin: boolean("is_admin").default(false),
+  isAdmin: boolean("is_admin").default(false),
 });
 
 // export const articles = pgTable("articles", {
@@ -79,6 +79,15 @@ export const insertUserSchema = createInsertSchema(users).pick({
   // bio: true,
 });
 
+export const selectUserSchema = createSelectSchema(users).pick({
+  username: true,
+  // password: true,
+  displayName: true,
+  role: true,
+  // avatarUrl: true,
+  // bio: true,
+});
+
 // export const insertArticleSchema = createInsertSchema(articles).pick({
 //   userId: true,
 //   title: true,
@@ -87,6 +96,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 // });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type SelectUser = z.infer<typeof selectUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // export type InsertArticle = z.infer<typeof insertArticleSchema>;

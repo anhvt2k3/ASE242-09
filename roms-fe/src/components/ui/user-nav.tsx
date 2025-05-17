@@ -59,10 +59,10 @@ export function UserNav() {
             <Home className="mr-2 h-4 w-4" />
             <span>Home</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate("/articles/create")}>
+          {/* <DropdownMenuItem onClick={() => navigate("/articles/create")}>
             <FileEdit className="mr-2 h-4 w-4" />
             <span>New Article</span>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem onClick={() => navigate("/profile")}>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
