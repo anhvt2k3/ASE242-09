@@ -34,4 +34,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
+  // server: {
+  //   port: 8080, // Add this line to set the development server port
+  // },
 });
