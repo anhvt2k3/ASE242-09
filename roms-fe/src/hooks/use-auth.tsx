@@ -42,17 +42,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     isLoading,
   } = useQuery<AuthUser | null, Error>({
-    queryKey: ["/api/user"], 
+    queryKey: ["/api/auth/user"], 
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
+      const res = await apiRequest("POST", "/api/auth/login", credentials);
       return await res.json();
     },
     onSuccess: (user: AuthUser) => {
-      queryClient.setQueryData(["/api/user"], user);
+      queryClient.setQueryData(["/api/auth/user"], user);
       toast({
         title: "Login successful",
         description: `Welcome back${user.displayName ? `, ${user.displayName}` : ''}!`,
@@ -69,11 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const guestLoginMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/login/guest");
+      const res = await apiRequest("POST", "/api/auth/login/guest");
       return await res.json();
     },
     onSuccess: (userData: AuthUser) => {
-      queryClient.setQueryData(["/api/user"], { ...userData, isGuest: true });
+      // queryClient.setQueryData(["/api/auth/user"], { ...userData, isGuest: true });
       toast({
         title: "Guest access granted",
         description: "You are now browsing as a guest",
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: AuthUser) => {
-      queryClient.setQueryData(["/api/user"], user);
+      queryClient.setQueryData(["/api/auth/user"], user);
       toast({
         title: "Registration successful",
         description: `Welcome to ArticleSpace${user.displayName ? `, ${user.displayName}` : ''}!`,
@@ -113,10 +113,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      await apiRequest("POST", "/api/auth/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
+      queryClient.setQueryData(["/api/auth/user"], null);
       toast({
         title: "Logged out",
         description: "You have been successfully logged out",

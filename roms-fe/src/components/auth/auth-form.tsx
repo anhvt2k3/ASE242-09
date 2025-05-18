@@ -90,8 +90,12 @@ export function AuthForm() {
   const handleGuestLogin = () => {
     guestLoginMutation.mutate(undefined, {
       onSuccess: () => {
-        navigate("/"); // Redirect to an article
+        navigate("/home"); // Redirect to an article
       },
+      onError: () => {
+        // Handle error if needed
+        navigate("/home"); 
+      }
     });
   };
 
@@ -125,6 +129,7 @@ export function AuthForm() {
                 )}
               />
               
+              {/* # Add password format checker here */}
               <FormField
                 control={loginForm.control}
                 name="password"
@@ -132,9 +137,9 @@ export function AuthForm() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      {/* <a href="#" className="text-sm text-primary hover:text-primary/90">
+                      <a href="#" className="text-sm text-primary hover:text-primary/90">
                         Forgot password?
-                      </a> */}
+                      </a>
                     </div>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
