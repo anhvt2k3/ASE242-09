@@ -12,7 +12,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const baseUrl = "http://localhost:8080";
+  const baseUrl = "https://localhost:7288";
   const res = await fetch(`${baseUrl}${url}`, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
