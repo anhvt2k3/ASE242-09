@@ -1,0 +1,4 @@
+// auth.ts
+export function getAuthToken(): string {
+  return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW52YW5hQGV4YW1wbGUuY29tIiwicm9sZSI6W3siYXV0aG9yaXR5IjoiUk9MRV9MRUNUVVJFUiJ9XSwiaWF0IjoxNzQ3NTYxMDg3LCJleHAiOjE3NTExNjEwODd9.DD9R0t_0VPYqIht-i0jO4xN84MKP2i6zMjdo9lf5S1g";
+}
