@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import env from 'src/config/env'
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -12,8 +13,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const baseUrl = "https://localhost:7288";
-  const res = await fetch(`${baseUrl}${url}`, {
+  const res = await fetch(`${env.BE_DOMAIN}${url}`, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
