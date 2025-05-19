@@ -5,13 +5,14 @@ import { Navbar } from "@/components/layout/navbar";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
-import { getAuthToken } from "./auth"; // Adjust path if needed
+// import { getAuthToken } from "./auth"; // Adjust path if needed
+import { apiRequest } from "@/lib/queryClient";
 
 const { Option } = Select;
 
 export default function BookingPage() {
   const { user } = useAuth();
-  const token = getAuthToken();
+  // const token = getAuthToken();
 
   const [campus, setCampus] = useState("");
   const [building, setBuilding] = useState("");
@@ -76,15 +77,16 @@ export default function BookingPage() {
     const endSession = Math.max(...selectedSlots);
 
     try {
-      const url = `https://dcc8-116-110-42-167.ngrok-free.app/api/roomschedules/isAvailable?date=${encodeURIComponent(formattedDate)}&startSession=${startSession}&endSession=${endSession}&campus=${encodeURIComponent(campus)}&building=${encodeURIComponent(building)}&name=${encodeURIComponent(room)}`;
+      // const url = `https://dcc8-116-110-42-167.ngrok-free.app/api/roomschedules/isAvailable?date=${encodeURIComponent(formattedDate)}&startSession=${startSession}&endSession=${endSession}&campus=${encodeURIComponent(campus)}&building=${encodeURIComponent(building)}&name=${encodeURIComponent(room)}`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          "ngrok-skip-browser-warning": "true",
-        },
-      });
+      // const response = await fetch(url, {
+      //   method: "GET",
+      //   headers: {
+      //     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      //     "ngrok-skip-browser-warning": "true",
+      //   },
+      // });
+      const response = await apiRequest("GET", "/api/roomschedules/isAvailable?date=" + encodeURIComponent(formattedDate) + "&startSession=" + startSession + "&endSession=" + endSession + "&campus=" + encodeURIComponent(campus) + "&building=" + encodeURIComponent(building) + "&name=" + encodeURIComponent(room));
 
       if (!response.ok) {
         throw new Error("Failed to check availability");
@@ -114,28 +116,40 @@ export default function BookingPage() {
     const formattedDate = date.format("YYYY-MM-DD");
     const startSession = Math.min(...selectedSlots);
     const endSession = Math.max(...selectedSlots);
-    const token = getAuthToken();
+    // const token = getAuthToken();
 
     try {
-      await fetch(`https://dcc8-116-110-42-167.ngrok-free.app/api/roomschedules`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          "ngrok-skip-browser-warning": "true",
-        },
-        body: JSON.stringify({
-          campus,
-          building,
-          room,
-          date: formattedDate,
-          slots: selectedSlots,
-          courseCode,
-          courseName,
-          description,
-          autoToggle,
-        }),
+      await apiRequest("POST", "/api/roomschedules", {
+        campus,
+        building,
+        room,
+        date: formattedDate,
+        startSession,
+        endSession,
+        courseCode,
+        courseName,
+        description,
+        autoToggle,
       });
+      // await fetch(`https://dcc8-116-110-42-167.ngrok-free.app/api/roomschedules`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      //     "ngrok-skip-browser-warning": "true",
+      //   },
+      //   body: JSON.stringify({
+      //     campus,
+      //     building,
+      //     room,
+      //     date: formattedDate,
+      //     slots: selectedSlots,
+      //     courseCode,
+      //     courseName,
+      //     description,
+      //     autoToggle,
+      //   }),
+      // });
 
       alert("Room booking successful!");
       resetForm();
