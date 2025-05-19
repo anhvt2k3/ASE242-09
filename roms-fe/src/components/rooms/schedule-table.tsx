@@ -226,7 +226,7 @@ function WeeklyScheduleTable({
                         ))}
                       </div>
                     ) : (
-                      user ? (
+                      user?.role=='lecturer' ? (
                         <button
                           onClick={() => onBookRoom(room.id, dayStr)}
                           className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
@@ -239,7 +239,7 @@ function WeeklyScheduleTable({
                         </button>
                       ) : (
                       <div className="text-center text-xs text-muted-foreground pt-4">
-                        Available
+                        No Session
                       </div>
                     )
                     )}

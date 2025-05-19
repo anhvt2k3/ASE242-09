@@ -80,7 +80,7 @@ export default function HomePage() {
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold ml-4">Room Schedules</h1>
-          {user && (
+          {user?.role=='lecturer' && (
             <Button onClick={() => handleBookRoom()} className="flex items-center gap-2 mr-4">
               <PlusCircle className="h-4 w-4" />
               Book a Room
