@@ -1,19 +1,19 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
-import env from './config/env'
+import env from '/src/config/env'
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
-}
+} 
 
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(`${env.BE_DOMAIN}${url}`, {
+  const res = await fetch(`${env.VITE_BE_DOMAIN}${url}`, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
