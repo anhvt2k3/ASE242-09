@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "wouter";
 import { DatePicker, Modal, AutoComplete, Select } from "antd";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/layout/navbar";
@@ -7,17 +8,43 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 // import { getAuthToken } from "./auth"; // Adjust path if needed
 import { apiRequest } from "@/lib/queryClient";
+import { DatabaseZap } from "lucide-react";
 
 const { Option } = Select;
 
 export default function BookingPage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const dateParam = searchParams.get("date");
   // const token = getAuthToken();
 
   const [campus, setCampus] = useState("");
   const [building, setBuilding] = useState("");
-  const [room, setRoom] = useState("");
-  const [date, setDate] = useState<Dayjs | null>(null);
+  const [room, setRoom] = useState(() => {
+    const roomId = searchParams.get("roomId");
+
+    if (roomId) {
+      (async () => {
+        try {
+          const res = await apiRequest("GET", `/api/rooms/${roomId}`);
+          const data = await res.json() as {
+            name: string;
+            number: number;
+            floor: number;
+            building: string;
+            campus: string;
+          };
+          setRoom(data.name); // asynchronously update
+        } catch (err) {
+          console.error("Room fetch failed", err);
+        }
+      })();
+    }
+
+    return ""; // initial value
+  });
+
+  const [date, setDate] = useState<Dayjs | null>(dateParam ? dayjs(dateParam) : null);
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [courseCode, setCourseCode] = useState("");
   const [courseName, setCourseName] = useState("");

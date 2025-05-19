@@ -145,7 +145,7 @@ function DailyScheduleTable({
                           </div>
                         </button>
                       ) : (
-                        <span className="text-muted-foreground text-xs">Available</span>
+                        <span className="text-muted-foreground text-xs">No Session</span>
                       )
                     )}
                   </td>
