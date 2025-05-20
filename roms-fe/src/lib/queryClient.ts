@@ -1,5 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
-import env from '/src/config/env'
+import env from '../config/env'
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
