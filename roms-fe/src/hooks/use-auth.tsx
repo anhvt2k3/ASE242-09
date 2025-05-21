@@ -9,6 +9,8 @@ import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
+const API_BASE_URL = "https://localhost:7288";
+
 // Extend the User type to include isGuest flag
 type AuthUser = Partial<User> & { isGuest?: boolean };
 
@@ -23,14 +25,19 @@ type AuthContextType = {
 };
 
 // Extended schema for registration
-const registerSchema = insertUserSchema.extend({
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const registerSchema = insertUserSchema
+  .extend({
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-type LoginData = Pick<z.infer<typeof insertUserSchema>, "username" | "password">;
+type LoginData = Pick<
+  z.infer<typeof insertUserSchema>,
+  "username" | "password"
+>;
 type RegisterData = z.infer<typeof registerSchema>;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -42,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     isLoading,
   } = useQuery<AuthUser | null, Error>({
-    queryKey: ["/api/auth/user"], 
+    queryKey: [`${API_BASE_URL}/api/auth/user`],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
@@ -52,10 +59,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: AuthUser) => {
-      queryClient.setQueryData(["/api/auth/user"], user);
+      queryClient.setQueryData([`${API_BASE_URL}/api/auth/user`], user);
       toast({
         title: "Login successful",
-        description: `Welcome back${user.displayName ? `, ${user.displayName}` : ''}!`,
+        description: `Welcome back${
+          user.displayName ? `, ${user.displayName}` : ""
+        }!`,
       });
     },
     onError: (error: Error) => {
@@ -89,17 +98,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (formData: RegisterData) => {
-      // Remove confirmPassword before sending to server
-      const { confirmPassword, ...registerData } = formData;
-      const res = await apiRequest("POST", "/api/register", registerData);
-      return await res.json();
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      endpoint: string;
+    }) => {
+      const { endpoint, ...userData } = data;
+      const response = await apiRequest("POST", `/${endpoint}`, userData);
+
+      if (!response.ok) {
+        throw new Error("Registration failed");
+      }
+
+      return response.json();
     },
     onSuccess: (user: AuthUser) => {
-      queryClient.setQueryData(["/api/auth/user"], user);
+      queryClient.setQueryData([`${API_BASE_URL}/api/auth/user`], user);
       toast({
         title: "Registration successful",
-        description: `Welcome to ArticleSpace${user.displayName ? `, ${user.displayName}` : ''}!`,
+        description: `Welcome to ArticleSpace${
+          user.displayName ? `, ${user.displayName}` : ""
+        }!`,
       });
     },
     onError: (error: Error) => {
@@ -116,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/auth/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/auth/user"], null);
+      queryClient.setQueryData([`${API_BASE_URL}/api/auth/user`], null);
       toast({
         title: "Logged out",
         description: "You have been successfully logged out",

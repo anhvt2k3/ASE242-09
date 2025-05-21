@@ -3,56 +3,59 @@ import { RoomWithSchedule, RoomFilters } from "@/types/rooms";
 import { API_BASE_URL } from "./api-config";
 import { apiRequest } from "./queryClient";
 
-export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule[]> => {
+export const fetchRooms = async (
+  filters: RoomFilters
+): Promise<RoomWithSchedule[]> => {
   try {
     const queryParams = new URLSearchParams();
-    
+
     if (filters.building && filters.building !== "all") {
-      queryParams.append('building', filters.building);
+      queryParams.append("building", filters.building);
     }
-    
+
     if (filters.type && filters.type !== "all") {
-      queryParams.append('type', filters.type);
+      queryParams.append("type", filters.type);
     }
-    
+
     if (filters.roomNumber) {
-      queryParams.append('roomNumber', filters.roomNumber);
+      queryParams.append("roomNumber", filters.roomNumber);
     }
-    
+
     if (filters.date) {
-      queryParams.append('date', filters.date);
+      queryParams.append("date", filters.date);
     }
 
     if (filters.period) {
-      queryParams.append('period', filters.period);
+      queryParams.append("period", filters.period);
     }
-    
+
     if (filters.session && filters.session !== "all") {
-      queryParams.append('session', filters.session);
+      queryParams.append("session", filters.session);
     }
-    
+
     if (filters.lecturerId) {
-      queryParams.append('lecturerId', filters.lecturerId);
+      queryParams.append("lecturerId", filters.lecturerId);
     }
-    
+
     const url = `${API_BASE_URL}/rooms?${queryParams.toString()}`;
-    const response = await apiRequest('GET', url);
+    const response = await apiRequest("GET", url);
     const data = await response.json();
-    
+
     return data;
-    
   } catch (error) {
     console.error("Error fetching rooms:", error);
-    
+
     return [];
   }
 };
 
 // Mock API functions
-export const fetchMockRooms = async (filters: RoomFilters): Promise<RoomWithSchedule[]> => {
+export const fetchMockRooms = async (
+  filters: RoomFilters
+): Promise<RoomWithSchedule[]> => {
   // Simulate API loading
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   // Mock rooms with schedules
   const mockRooms: RoomWithSchedule[] = [
     {
@@ -71,7 +74,7 @@ export const fetchMockRooms = async (filters: RoomFilters): Promise<RoomWithSche
           lecturerId: "l1",
           subject: "Computer Science",
           courseCode: "CO1011",
-          lecturer: { id: "l1", name: "Dr. Nguyen Van A", department: "CS" }
+          lecturer: { id: "l1", name: "Dr. Nguyen Van A", department: "CS" },
         },
         {
           id: "s2",
@@ -82,9 +85,9 @@ export const fetchMockRooms = async (filters: RoomFilters): Promise<RoomWithSche
           lecturerId: "l2",
           subject: "Algorithms",
           courseCode: "SP1012",
-          lecturer: { id: "l2", name: "Dr. Tran Thi B", department: "CS" }
-        }
-      ]
+          lecturer: { id: "l2", name: "Dr. Tran Thi B", department: "CS" },
+        },
+      ],
     },
     {
       id: "2",
@@ -102,9 +105,9 @@ export const fetchMockRooms = async (filters: RoomFilters): Promise<RoomWithSche
           lecturerId: "l3",
           subject: "Chemistry Lab",
           courseCode: "CH1003",
-          lecturer: { id: "l3", name: "Dr. Le Van C", department: "Chemistry" }
-        }
-      ]
+          lecturer: { id: "l3", name: "Dr. Le Van C", department: "Chemistry" },
+        },
+      ],
     },
     {
       id: "3",
@@ -112,32 +115,36 @@ export const fetchMockRooms = async (filters: RoomFilters): Promise<RoomWithSche
       building: "C1",
       type: "Seminar Room",
       capacity: 30,
-      schedules: []
-    }
+      schedules: [],
+    },
   ];
-  
+
   // Apply filters
   let filteredRooms = [...mockRooms];
-  
+
   if (filters.building && filters.building !== "all") {
-    filteredRooms = filteredRooms.filter(room => room.building === filters.building);
+    filteredRooms = filteredRooms.filter(
+      (room) => room.building === filters.building
+    );
   }
-  
+
   if (filters.type && filters.type !== "all") {
-    filteredRooms = filteredRooms.filter(room => room.type === filters.type);
+    filteredRooms = filteredRooms.filter((room) => room.type === filters.type);
   }
-  
+
   if (filters.roomNumber) {
-    filteredRooms = filteredRooms.filter(room => 
+    filteredRooms = filteredRooms.filter((room) =>
       room.roomNumber.toLowerCase().includes(filters.roomNumber.toLowerCase())
     );
   }
-  
+
   if (filters.lecturerId) {
-    filteredRooms = filteredRooms.filter(room => 
-      room.schedules.some(schedule => schedule.lecturerId === filters.lecturerId)
+    filteredRooms = filteredRooms.filter((room) =>
+      room.schedules.some(
+        (schedule) => schedule.lecturerId === filters.lecturerId
+      )
     );
   }
-  
+
   return filteredRooms;
 };
