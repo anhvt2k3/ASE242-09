@@ -1,4 +1,6 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+// import { getAuthToken } from "@/auth"; // adjust the path if needed
+
 import env from '../config/env'
 
 async function throwIfResNotOk(res: Response) {

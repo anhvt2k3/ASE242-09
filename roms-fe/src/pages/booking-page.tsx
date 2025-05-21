@@ -416,21 +416,24 @@
 
 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "wouter";
 import { DatePicker, Modal, AutoComplete, Select } from "antd";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/layout/navbar";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
+import { apiRequest } from "@/lib/queryClient";
+import { DatabaseZap } from "lucide-react";
+import { getAuthToken } from "./auth"; // Adjust path if needed
 
 const { Option } = Select;
 
 export default function BookingPage() {
   const { user } = useAuth();
 
-  const [campus, setCampus] = useState("");
+  const [campus, setCampus] = useState("1");
   const [building, setBuilding] = useState("");
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState<number | null>(null);
@@ -442,40 +445,65 @@ export default function BookingPage() {
   const [autoToggle, setAutoToggle] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [suggestions, setSuggestions] = useState<{ value: string }[]>([]);
-  const [locations, setLocations] = useState<{ [campus: string]: { [building: string]: { id: number, name: string }[] } }>({});
-  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [availableSlots, setAvailableSlots] = useState<number[]>([]);
+
+  const [buildings, setBuildings] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<{ id: number; name: string }[]>([]);
+
+  const [loadingCourseName, setLoadingCourseName] = useState(false);
+
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const campusList = [
+    { id: "1", name: "Campus 1" },
+    { id: "2", name: "Campus 2" },
+  ];
 
   useEffect(() => {
-  const fetchBuildingsAndRooms = async () => {
+    if (!campus) return;
+
+    const fetchBuildings = async () => {
+      try {
+        const res = await apiRequest("POST", `/api/roomschedules/buildingByCampus?campus=${campus}`);
+        const data = await res.json();
+        setBuildings(data.filter((b: string) => b != null && b !== ""));
+        setBuilding("");
+        setRooms([]);
+        setName("");
+        setRoomId(null);
+      } catch (error) {
+        console.error("Failed to fetch buildings", error);
+      }
+    };
+
+    fetchBuildings();
+  }, [campus]);
+
+useEffect(() => {
+  if (!building || !campus) return;
+
+  const fetchRooms = async () => {
     try {
-      const campusIds = [1]; // Extend this list if needed
-      const newLocations: typeof locations = {};
+      const res = await apiRequest("POST", `/api/roomschedules/nameByBuilding?building=${building}&campus=${campus}`);
+      const data = await res.json();
+      //console.log("Fetched rooms:", data);
 
-      for (const campusId of campusIds) {
-        const campusKey = String(campusId); // Always use string keys
-        const buildingsRes = await apiRequest("GET", `/api/roomschedules/buildingByCampus?campus=${campusId}`);
-        const buildings = await buildingsRes.json();
-
-        newLocations[campusKey] = {};
-
-        for (const building of buildings) {
-          const roomsRes = await apiRequest("GET", `/api/roomschedules/nameByBuilding?building=${building}&campus=${campusId}`);
-          const rooms = await roomsRes.json();
-          newLocations[campusKey][building] = rooms.map((room: { id: number; name: string }) => room);
-        }
+      if (Array.isArray(data) && typeof data[0] === "string") {
+        // Convert string array to objects with ids
+        setRooms(data.map((name, idx) => ({ id: idx, name })));
+      } else {
+        setRooms(Array.isArray(data) ? data : data.rooms || []);
       }
 
-      setLocations(newLocations);
+      setName("");
+      setRoomId(null);
     } catch (error) {
-      console.error("Failed to load locations", error);
-      alert(error);
-    } finally {
-      setLoadingLocations(false);
+      console.error("Failed to fetch rooms", error);
     }
   };
 
-  fetchBuildingsAndRooms();
-}, []);
+  fetchRooms();
+}, [building, campus]);
 
 
   const handleSlotClick = (slot: number) => {
@@ -486,31 +514,104 @@ export default function BookingPage() {
   };
 
   const handleConfirmClick = async () => {
-    if (!campus || !building || !name || !roomId || !date || selectedSlots.length === 0 || !courseCode.trim() || !courseName.trim()) {
-      alert("Please fill in all required fields.");
+  if (
+    !campus ||
+    !building ||
+    !name ||
+    !roomId ||
+    !date ||
+    selectedSlots.length === 0 ||
+    !courseCode.trim() ||
+    !courseName.trim()
+  ) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  const formattedDate = date.format("YYYY-MM-DD");
+  const startSession = Math.min(...selectedSlots);
+  const endSession = Math.max(...selectedSlots);
+
+  try {
+    // 2. Check lecturer (user) availability
+    const lecturerRes = await apiRequest(
+      "POST",
+      `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
+    );
+    const lecturerData = await lecturerRes.json();
+    const isLecturerAvailable = lecturerData.available ?? true;
+
+    if (!isLecturerAvailable) {
+      alert("You are already booked during these sessions. Please choose different slots.");
       return;
     }
 
-    const formattedDate = date.format("YYYY-MM-DD");
+    setIsModalVisible(true); // All checks passed, show confirmation modal
+  } catch (err) {
+    console.error(err);
+    alert("Error checking availability. Please try again.");
+  }
+};
 
+useEffect(() => {
+  if (!date || !name || !campus) return;
+
+  const fetchAvailableSlots = async () => {
     try {
-      const response = await apiRequest("GET", `/api/roomschedules/available/${formattedDate}?id=${roomId}`);
-      const data = await response.json();
+      const formattedDate = date.format("YYYY-MM-DD");
+      const res = await apiRequest(
+        "POST",
+        `/api/roomschedules/available/${formattedDate}?campus=${campus}&name=${encodeURIComponent(name)}`
+      );
+      const data = await res.json();
+      console.log("Room availability response:", data);
+      const slots = Array.isArray(data) ? data : [];
+      setAvailableSlots(slots);
+      console.log("Fetched available slots:", slots);
+    } catch (error) {
+      console.error("Error fetching available slots:", error);
+      setAvailableSlots([]);
+    }
+  };
 
-      const availableSlots: number[] = data.sessions || [];
-      const isAvailable = selectedSlots.every((s) => availableSlots.includes(s));
+  fetchAvailableSlots();
+}, [date, name, campus]);
 
-      if (!isAvailable) {
-        alert("Selected slots are not available. Please choose different slots.");
+
+
+useEffect(() => {
+  if (!courseCode.trim()) {
+    setCourseName("");
+    return;
+  }
+
+  if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+  debounceTimeout.current = setTimeout(async () => {
+    setLoadingCourseName(true);
+    try {
+      const res = await apiRequest("POST", `/api/roomschedules/getsubject/${encodeURIComponent(courseCode.trim())}`);
+      if (!res.ok) {
+        setCourseName("");
+        setLoadingCourseName(false);
         return;
       }
 
-      setIsModalVisible(true);
-    } catch (err) {
-      console.error(err);
-      alert("Error checking availability. Please try again.");
+      const data = await res.json();
+      setCourseName(data.subjectName || "");
+    } catch (error) {
+      console.error("Error fetching course name:", error);
+      setCourseName("");
+    } finally {
+      setLoadingCourseName(false);
     }
+  }, 500);
+
+  return () => {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
   };
+}, [courseCode]);
+
 
   const handleFinalConfirm = async () => {
     setIsModalVisible(false);
@@ -525,19 +626,20 @@ export default function BookingPage() {
     const endSession = Math.max(...selectedSlots);
 
     try {
-  await apiRequest("POST", "/api/roomschedules/booking", {
-    date: formattedDate,
-    name,
-    building,
-    campus,
-    subjectId: 1, // or use courseCode/courseName if needed
-    courseCode,
-    courseName,
-    description,
-    startSession,
-    endSession,
-    autoToggle,
-  });
+      await apiRequest("POST", "/api/roomschedules/booking", {
+        date: formattedDate,
+        name,
+        building,
+        campus,
+        roomId,
+        subjectId: 1,
+        courseCode,
+        courseName,
+        description,
+        startSession,
+        endSession,
+        autoToggle,
+      });
 
       alert("Room booking successful!");
       resetForm();
@@ -548,7 +650,7 @@ export default function BookingPage() {
   };
 
   const resetForm = () => {
-    setCampus("");
+    setCampus("1");
     setBuilding("");
     setName("");
     setRoomId(null);
@@ -566,7 +668,10 @@ export default function BookingPage() {
       return;
     }
 
-    const filtered = ["CO2001", "CO2002", "CO3001", "CO3002", "IM1013"]
+
+      
+
+    const filtered = ["CO2001", "CO1005", "CO3001", "CO3002", "IM1013"]
       .filter((code) => code.toLowerCase().includes(courseCode.toLowerCase()))
       .map((code) => ({ value: code }));
     setSuggestions(filtered);
@@ -593,17 +698,11 @@ export default function BookingPage() {
                 <Select
                   className="w-full"
                   value={campus}
-                  onChange={(value) => {
-                    setCampus(value);
-                    setBuilding("");
-                    setName("");
-                    setRoomId(null);
-                  }}
+                  onChange={(value) => setCampus(value)}
                   placeholder="Select campus"
-                  loading={loadingLocations}
                 >
-                  {Object.keys(locations).map((c) => (
-                    <Option key={c} value={c}>{c}</Option>
+                  {campusList.map((c) => (
+                    <Option key={c.id} value={c.id}>{c.name}</Option>
                   ))}
                 </Select>
               </div>
@@ -612,16 +711,13 @@ export default function BookingPage() {
                 <Select
                   className="w-full"
                   value={building}
-                  onChange={(value) => {
-                    setBuilding(value);
-                    setName("");
-                    setRoomId(null);
-                  }}
+                  onChange={(value) => setBuilding(value)}
                   placeholder="Select building"
                   disabled={!campus}
                 >
-                  {campus &&
-                    Object.keys(locations[campus] || {}).map((b) => (
+                {buildings
+                    .filter((b) => b != null && b !== "") 
+                    .map((b) => (
                       <Option key={b} value={b}>{b}</Option>
                     ))}
                 </Select>
@@ -633,15 +729,17 @@ export default function BookingPage() {
                   value={name}
                   onChange={(value) => {
                     setName(value);
-                    const selected = (locations[campus]?.[building] || []).find(r => r.name === value);
+                    const selected = rooms.find(r => r.name === value);
                     setRoomId(selected?.id || null);
                   }}
                   placeholder="Select room"
                   disabled={!building}
                 >
-                  {(locations[campus]?.[building] || []).map((r) => (
-                    <Option key={r.id} value={r.name}>{r.name}</Option>
-                  ))}
+                {rooms
+                    .filter((r) => r.name != null && r.name !== "") 
+                    .map((r) => (
+                      <Option key={r.id} value={r.name}>{r.name}</Option>
+                    ))}
                 </Select>
               </div>
             </div>
@@ -655,19 +753,31 @@ export default function BookingPage() {
           <div className="border p-4 rounded-lg space-y-4">
             <h2 className="text-lg font-semibold text-gray-800 mb-2">Select Slots</h2>
             <div className="grid grid-cols-4 gap-2">
-              {Array.from({ length: 16 }, (_, i) => i + 1).map((slot) => (
-                <button
-                  key={slot}
-                  className={`px-3 py-2 rounded-md text-sm font-semibold ${
-                    selectedSlots.includes(slot)
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-blue-100"
-                  }`}
-                  onClick={() => handleSlotClick(slot)}
-                >
-                  Session {slot}
-                </button>
-              ))}
+              {Array.from({ length: 16 }, (_, i) => i + 1).map((slot) => {
+                const isAvailable = availableSlots.includes(slot);
+                const isSelected = selectedSlots.includes(slot);
+
+                return (
+                  <button
+                    key={slot}
+                    disabled={!isAvailable}
+                    className={`px-3 py-2 rounded-md text-sm font-semibold ${
+                      isSelected
+                        ? "bg-blue-500 text-white"
+                        : isAvailable
+                          ? "bg-gray-200 text-gray-700 hover:bg-blue-100"
+                          : "bg-red-100 text-red-400 cursor-not-allowed"
+                    }`}
+                    onClick={() => {
+                      if (!isAvailable) return;
+                      handleSlotClick(slot);
+                    }}
+                  >
+                    Session {slot}
+                  </button>
+                );
+              })}
+
             </div>
           </div>
 
@@ -684,23 +794,29 @@ export default function BookingPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Course Name</label>
+              <label className="block text-sm text-gray-700 mb-1 mt-4">Course Name</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-2"
+                placeholder="Course Name"
                 value={courseName}
-                onChange={(e) => setCourseName(e.target.value)}
+                readOnly
               />
+              {loadingCourseName && (
+                <p className="text-sm text-gray-500 mt-1">Loading course name...</p>
+              )}
             </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Lesson Content</label>
-              <textarea
-                className="w-full border border-gray-300 rounded-md p-2"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
+          </div>
+
+          <div className="border p-4 rounded-lg">
+            <label className="block text-sm text-gray-700 mb-1">Description</label>
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-2"
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Additional details"
+            />
           </div>
 
           <div className="flex items-center">
