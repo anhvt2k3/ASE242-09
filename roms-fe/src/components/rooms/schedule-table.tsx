@@ -1,4 +1,4 @@
-import { format, isSameDay, parseISO, startOfDay } from "date-fns";
+import { format, isSameDay, parseISO, startOfDay, addDays, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, PlusCircle } from "lucide-react";
@@ -26,12 +26,32 @@ export function ScheduleTable({
   weekEnd,
   onBookRoom
 }: ScheduleTableProps) {
+  // Tạo hàm để xử lý ngày an toàn
+  const formatDateSafe = (dateString: string) => {
+    try {
+      // Kiểm tra xem dateString có đúng định dạng không
+      const parsedDate = parseISO(dateString);
+      
+      // Kiểm tra xem ngày có hợp lệ không
+      if (isValid(parsedDate)) {
+        return format(parsedDate, "MMMM d, yyyy");
+      }
+      
+      // Trả về ngày hiện tại nếu không hợp lệ
+      return format(new Date(), "MMMM d, yyyy");
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      // Fallback nếu có lỗi
+      return format(new Date(), "MMMM d, yyyy");
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           Room Schedules
-          {filters.period === "day" && ` for ${format(parseISO(filters.date), "MMMM d, yyyy")}`}
+          {filters.period === "day" && filters.date && ` for ${formatDateSafe(filters.date)}`}
           {filters.period === "week" && ` for Week of ${format(weekStart, "MMMM d")} - ${format(weekEnd, "d, yyyy")}`}
           {filters.session && filters.session !== "all" && ` (${filters.session === "morning" ? "Morning" : "Afternoon"} Sessions)`}
         </CardTitle>
@@ -145,7 +165,8 @@ function DailyScheduleTable({
                     </div>
                   ) : (
                     user ? (
-                      parseISO(filters.date) > startOfDay(new Date()) ? (
+                      // Thêm kiểm tra filters.date hợp lệ trước khi parse
+                      filters.date && isValid(parseISO(filters.date)) && parseISO(filters.date) > startOfDay(new Date()) ? (
                       <button
                         onClick={() => onBookRoom(room.id, filters.date)}
                         className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"

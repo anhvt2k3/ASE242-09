@@ -1,8 +1,55 @@
 import { format, addDays } from "date-fns";
 import { RoomWithSchedule, RoomFilters } from "@/types/rooms";
+import { API_BASE_URL } from "./api-config";
+import { apiRequest } from "./queryClient";
+
+export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule[]> => {
+  try {
+    const queryParams = new URLSearchParams();
+    
+    if (filters.building && filters.building !== "all") {
+      queryParams.append('building', filters.building);
+    }
+    
+    if (filters.type && filters.type !== "all") {
+      queryParams.append('type', filters.type);
+    }
+    
+    if (filters.roomNumber) {
+      queryParams.append('roomNumber', filters.roomNumber);
+    }
+    
+    if (filters.date) {
+      queryParams.append('date', filters.date);
+    }
+
+    if (filters.period) {
+      queryParams.append('period', filters.period);
+    }
+    
+    if (filters.session && filters.session !== "all") {
+      queryParams.append('session', filters.session);
+    }
+    
+    if (filters.lecturerId) {
+      queryParams.append('lecturerId', filters.lecturerId);
+    }
+    
+    const url = `${API_BASE_URL}/rooms?${queryParams.toString()}`;
+    const response = await apiRequest('GET', url);
+    const data = await response.json();
+    
+    return data;
+    
+  } catch (error) {
+    console.error("Error fetching rooms:", error);
+    
+    return [];
+  }
+};
 
 // Mock API functions
-export const fetchRooms = async (filters: RoomFilters): Promise<RoomWithSchedule[]> => {
+export const fetchMockRooms = async (filters: RoomFilters): Promise<RoomWithSchedule[]> => {
   // Simulate API loading
   await new Promise(resolve => setTimeout(resolve, 500));
   

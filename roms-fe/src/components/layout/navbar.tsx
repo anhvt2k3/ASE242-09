@@ -2,11 +2,19 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { UserNav } from "@/components/ui/user-nav";
-import { Shield } from "lucide-react";
+import { Shield, User } from "lucide-react";
 
 export function Navbar() {
   const { user } = useAuth();
   const [location, navigate] = useLocation();
+  
+  // Add this function
+  const enableTestMode = () => {
+    // This is a sample JWT format with a fake signature - for development only
+    const fakeJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikd1ZXN0IFVzZXIiLCJyb2xlIjoiTEVDVFVSRVIiLCJpYXQiOjE1MTYyMzkwMjJ9.fake_signature";
+    localStorage.setItem('token', fakeJwt);
+    window.location.reload();
+  };
   
   return (
     <header className="bg-white border-b border-neutral-200 sticky top-0 z-10">
@@ -49,9 +57,20 @@ export function Navbar() {
             {user ? (
               <UserNav />
             ) : (
-              <Button onClick={() => navigate("/auth")}>
-                Log in
-              </Button>
+              <>
+                {/* Add Test Mode button here */}
+                <Button 
+                  variant="outline" 
+                  onClick={enableTestMode}
+                  className="mr-2"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Test Mode
+                </Button>
+                <Button onClick={() => navigate("/auth")}>
+                  Log in
+                </Button>
+              </>
             )}
           </div>
         </div>

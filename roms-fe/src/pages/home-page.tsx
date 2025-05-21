@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { RoomFilters } from "@/types/rooms"; 
-import { fetchRooms } from "@/lib/services";
+import { filterRoomSchedules, transformBackendData } from "@/lib/api-module";
 import { FiltersPanel } from "@/components/rooms/filters-panel";
 import { ScheduleTable } from "@/components/rooms/schedule-table";
 import { Navbar } from "@/components/layout/navbar";
 
 export default function HomePage() {
+  // Existing state and hooks
   const { user } = useAuth();
   const [_, setLocation] = useLocation();
 
@@ -25,7 +26,6 @@ export default function HomePage() {
     lecturerId: ""
   });
   
-  
   const [showMySchedules, setShowMySchedules] = useState(false);
   
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
@@ -33,11 +33,69 @@ export default function HomePage() {
   const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
-  const { data: rooms, isLoading } = useQuery({
-    queryKey: ["rooms", filters],
-    queryFn: () => fetchRooms(filters),
-  });
+  // Convert frontend filters to backend API filters
+  const prepareApiFilters = () => {
+    const apiFilters: any = {};
+    
+    if (filters.building && filters.building !== "all") {
+      apiFilters.building = filters.building;
+    }
+    
+    if (filters.type && filters.type !== "all") {
+      apiFilters.campus = filters.type; // Map type to campus as per backend
+    }
+    
+    if (filters.roomNumber) {
+      apiFilters.roomNumber = filters.roomNumber;
+    }
+    
+    if (filters.lecturerId) {
+      apiFilters.lecturerId = filters.lecturerId;
+    }
 
+    apiFilters.page = 0;
+    apiFilters.size = 100;
+    
+    // Handle dates based on period
+    if (filters.period === "day") {
+      apiFilters.startDate = filters.date;
+      apiFilters.endDate = filters.date;
+      
+      // Handle session filters
+      if (filters.session === "morning") {
+        apiFilters.startSession = 1;
+        apiFilters.endSession = 6;
+      } else if (filters.session === "afternoon") {
+        apiFilters.startSession = 7;
+        apiFilters.endSession = 17;
+      }
+    } else {
+      // For week view
+      apiFilters.startDate = format(weekStart, "yyyy-MM-dd");
+      apiFilters.endDate = format(weekEnd, "yyyy-MM-dd");
+    }
+    
+    return apiFilters;
+  };
+  
+  // Query for room data using the API
+  const { data: rooms, isLoading } = useQuery({
+    queryKey: ["rooms", filters, weekStart],
+    queryFn: async () => {
+      try {
+        // Call the API with prepared filters
+        const result = await filterRoomSchedules(prepareApiFilters());
+        
+        // Transform the backend data to match frontend format
+        return transformBackendData(result);
+      } catch (error) {
+        console.error("Error fetching schedules:", error);
+        return [];
+      }
+    },
+  });
+  
+  // Existing handlers remain the same
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     
@@ -73,7 +131,9 @@ export default function HomePage() {
     setCurrentWeek(prevDate => addDays(prevDate, days));
   };
 
+  // Component rendering stays the same
   return (
+    // Existing JSX
     <>
     <Navbar />
     <div className="container mx-auto py-6 max-w-7xl">

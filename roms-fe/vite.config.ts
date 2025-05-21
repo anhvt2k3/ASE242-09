@@ -34,7 +34,13 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
-  // server: {
-  //   port: 8080, // Add this line to set the development server port
-  // },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7288',
+        changeOrigin: true,
+        secure: false, // Bỏ qua xác minh chứng chỉ SSL
+      }
+    }
+  }
 });
