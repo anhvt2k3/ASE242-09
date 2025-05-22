@@ -9,8 +9,6 @@ import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-const API_BASE_URL = "https://localhost:7288"; // Replace with your actual API base URL
-
 // Extend the User type to include isGuest flag
 type AuthUser = Partial<User> & { isGuest?: boolean };
 
@@ -49,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     isLoading,
   } = useQuery<AuthUser | null, Error>({
-    queryKey: [`${API_BASE_URL}/api/auth/user`],
+    queryKey: [`/api/auth/user`],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
@@ -59,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: AuthUser) => {
-      queryClient.setQueryData([`${API_BASE_URL}/api/auth/user`], user);
+      queryClient.setQueryData([`/api/auth/user`], user);
       toast({
         title: "Login successful",
         description: `Welcome back${
@@ -78,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const guestLoginMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/auth/login/guest");
+      const res = await apiRequest("GET", "/api/auth/login/guest");
       return await res.json();
     },
     onSuccess: (userData: AuthUser) => {
@@ -115,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return response.json();
     },
     onSuccess: (user: AuthUser) => {
-      queryClient.setQueryData([`${API_BASE_URL}/api/auth/user`], user);
+      queryClient.setQueryData([`/api/auth/user`], user);
       toast({
         title: "Registration successful",
         description: `Welcome to ArticleSpace${
@@ -137,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/auth/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData([`${API_BASE_URL}/api/auth/user`], null);
+      queryClient.setQueryData([`/api/auth/user`], null);
       toast({
         title: "Logged out",
         description: "You have been successfully logged out",
