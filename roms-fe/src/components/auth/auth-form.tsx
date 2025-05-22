@@ -137,9 +137,9 @@ export function AuthForm() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-1 mb-6">
           <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="register">Register</TabsTrigger>
+          {/* <TabsTrigger value="register">Register</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="login">
@@ -231,7 +231,7 @@ export function AuthForm() {
           </Button>
         </TabsContent>
 
-        <TabsContent value="register">
+        {/* <TabsContent value="register">
           <Form {...registerForm}>
             <form
               onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
@@ -359,7 +359,7 @@ export function AuthForm() {
               </Button>
             </form>
           </Form>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );
