@@ -89,6 +89,7 @@ function DailyScheduleTable({
   onBookRoom: (roomId: string, date: string) => void;
 }) {
   const { user } = useAuth();
+  console.log("rooms", rooms);
 
   return (
     <table className="w-full border-collapse">
@@ -100,9 +101,18 @@ function DailyScheduleTable({
           {TIME_SLOTS.filter((slot) => {
             // Filter slots based on session if specified
             if (filters.session === "morning") {
-              return ["slot1", "slot2", "slot3"].includes(slot.id);
+              return [
+                "slot1",
+                "slot2",
+                "slot3",
+                "slot4",
+                "slot5",
+                "slot6",
+              ].includes(slot.id);
             } else if (filters.session === "afternoon") {
-              return ["slot4", "slot5", "slot6"].includes(slot.id);
+              return ["slot7", "slot8", "slot9", "slot10", "slot11"].includes(
+                slot.id
+              );
             }
             return true;
           }).map((slot) => (
@@ -121,59 +131,93 @@ function DailyScheduleTable({
             <td className="p-3 font-medium">{room.roomNumber}</td>
             <td className="p-3">{room.building}</td>
             <td className="p-3">{room.type}</td>
-            {TIME_SLOTS.filter((slot) => {
-              // Filter slots based on session if specified
-              if (filters.session === "morning") {
-                return ["slot1", "slot2", "slot3"].includes(slot.id);
-              } else if (filters.session === "afternoon") {
-                return ["slot4", "slot5", "slot6"].includes(slot.id);
-              }
-              return true;
-            }).map((slot) => {
-              const schedule = getRoomScheduleForTimeAndDay(
-                room,
-                slot.value,
-                filters.date
-              );
+            {(() => {
+              const timeSlots = TIME_SLOTS.filter((slot) => {
+                if (filters.session === "morning") {
+                  return [
+                    "slot1",
+                    "slot2",
+                    "slot3",
+                    "slot4",
+                    "slot5",
+                    "slot6",
+                  ].includes(slot.id);
+                } else if (filters.session === "afternoon") {
+                  return [
+                    "slot7",
+                    "slot8",
+                    "slot9",
+                    "slot10",
+                    "slot11",
+                  ].includes(slot.id);
+                }
+                return true;
+              });
+              let cells = [];
+              let i = 0;
+              while (i < timeSlots.length) {
+                const slot = timeSlots[i];
+                const schedule = getRoomScheduleForTimeAndDay(
+                  room,
+                  slot.value,
+                  filters.date
+                );
 
-              return (
-                <td
-                  key={`${room.id}-${slot.id}`}
-                  className={cn(
-                    "p-3 text-center",
-                    schedule ? "bg-primary/10" : "bg-green-50/30"
-                  )}
-                >
-                  {schedule ? (
-                    <div className="flex flex-col gap-1">
-                      <span className="font-medium text-sm">
-                        {schedule.subject}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {schedule.lecturer.name}
-                      </span>
-                    </div>
-                  ) : user ? (
-                    <button
-                      onClick={() => onBookRoom(room.id, filters.date)}
-                      className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
-                    >
-                      <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
-                        Available
-                      </span>
-                      <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                        <PlusCircle className="h-3 w-3 text-green-600" />
-                        <span className="text-green-600 text-xs">Book</span>
+                console.log(schedule);
+                let colspan = 1;
+                let j = i + 1;
+
+                while (j < timeSlots.length) {
+                  const nextSlot = timeSlots[j];
+                  const nextSchedule = getRoomScheduleForTimeAndDay(
+                    room,
+                    nextSlot.value,
+                    filters.date
+                  );
+                  if (nextSchedule === schedule) {
+                    colspan++;
+                    j++;
+                  } else {
+                    break;
+                  }
+                }
+                cells.push(
+                  <td
+                    key={`${room.id}-${slot.id}`}
+                    colSpan={colspan}
+                    className={`p-3 text-center border border-md ${
+                      schedule ? "bg-primary/10" : "bg-green-50/30"
+                    }`}
+                  >
+                    {schedule ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-sm">
+                          {schedule.subject}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {schedule.lecturer.name}
+                        </span>
                       </div>
-                    </button>
-                  ) : (
-                    <span className="text-muted-foreground text-xs">
-                      No Session
-                    </span>
-                  )}
-                </td>
-              );
-            })}
+                    ) : (
+                      <button
+                        onClick={() => onBookRoom(room.id, filters.date)}
+                        className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
+                      >
+                        <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
+                          Available
+                        </span>
+                        <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                          <PlusCircle className="h-3 w-3 text-green-600" />
+                          <span className="text-green-600 text-xs">Book</span>
+                        </div>
+                      </button>
+                    )}
+                  </td>
+                );
+                i = j;
+              }
+              return cells;
+            })()}
           </tr>
         ))}
       </tbody>
@@ -219,9 +263,17 @@ function WeeklyScheduleTable({
             <td className="p-3">{room.building}</td>
             {weekDates.map((date) => {
               const dayStr = format(date, "yyyy-MM-dd");
-              const daySchedules = room.schedules.filter(
-                (schedule) => schedule.day === dayStr
-              );
+              const daySchedules = room.schedules
+                .filter((schedule) => schedule.day === dayStr)
+                .sort((a, b) => {
+                  // Convert time strings to minutes for easy comparison
+                  const getMinutes = (timeStr) => {
+                    const [hours, minutes] = timeStr.split(":").map(Number);
+                    return hours * 60 + minutes;
+                  };
+
+                  return getMinutes(a.startTime) - getMinutes(b.startTime);
+                });
 
               return (
                 <td

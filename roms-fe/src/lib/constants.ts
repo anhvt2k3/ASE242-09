@@ -1,9 +1,14 @@
 export const BUILDINGS = ["A1", "A2", "B1", "B2", "C1", "C2", "H1", "H2", "H3"];
 
-export const ROOM_TYPES = ["Lecture Hall", "Laboratory", "Seminar Room", "Computer Lab"];
+export const ROOM_TYPES = [
+  "Lecture Hall",
+  "Laboratory",
+  "Seminar Room",
+  "Computer Lab",
+];
 
 export const TIME_SLOTS = [
-  { id: "slot1", label: "7:00 - 7:50", value: "7:00-8:50" },
+  { id: "slot1", label: "7:00 - 7:50", value: "7:00-7:50" },
   { id: "slot2", label: "8:00 - 8:50", value: "8:00-8:50" },
   { id: "slot3", label: "9:00 - 9:50", value: "9:00-9:50" },
   { id: "slot4", label: "10:00 - 10:50", value: "10:00-10:50" },

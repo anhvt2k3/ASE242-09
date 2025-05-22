@@ -18,11 +18,10 @@ export async function apiRequest(
   const res = await fetch(`${env.VITE_BE_DOMAIN}${url}`, {
     method,
     headers: 
-        {
+        data ? {
           "Content-Type": "application/json",
-          "X-Custom-Header": "force-preflight",
-          "ngrok-skip-browser-warning": "true",
-        },
+          // "ngrok-skip-browser-warning": "true",
+        } : {},
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -38,12 +37,6 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const res = await fetch(env.VITE_BE_DOMAIN+queryKey[0] as string, {
-    headers: 
-        {
-          "Content-Type": "application/json",
-          "X-Custom-Header": "force-preflight",
-          "ngrok-skip-browser-warning": "true",
-        },
       credentials: "include",
     });
 

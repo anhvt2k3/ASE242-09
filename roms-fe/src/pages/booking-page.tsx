@@ -424,6 +424,7 @@ import "antd/dist/reset.css";
 import { apiRequest } from "@/lib/queryClient";
 import { DatabaseZap } from "lucide-react";
 import { getAuthToken } from "./auth"; // Adjust path if needed
+import { InputValidationService } from "@/lib/inputValidator";
 
 const { Option } = Select;
 
@@ -534,14 +535,15 @@ export default function BookingPage() {
     const startSession = Math.min(...selectedSlots);
     const endSession = Math.max(...selectedSlots);
 
-  try {
-    // 2. Check lecturer (user) availability
-    const lecturerRes = await apiRequest(
-      "GET",
-      `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
-    );
-    const lecturerData = await lecturerRes.json();
-    const isLecturerAvailable = lecturerData.available ?? true;
+    try {
+      setDescription(InputValidationService.cleanseInput(description));
+      // 2. Check lecturer (user) availability
+      const lecturerRes = await apiRequest(
+        "GET",
+        `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
+      );
+      const lecturerData = await lecturerRes.json();
+      const isLecturerAvailable = lecturerData.available ?? true;
 
       if (!isLecturerAvailable) {
         alert(
@@ -553,7 +555,7 @@ export default function BookingPage() {
       setIsModalVisible(true); // All checks passed, show confirmation modal
     } catch (err) {
       console.error(err);
-      alert("Error checking availability. Please try again.");
+      alert("Error checking your booking informations. Please try again.");
     }
   };
 
