@@ -13,7 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 
+import { apiRequest } from "@/lib/queryClient";
 import { BUILDINGS, ROOM_TYPES } from "@/lib/constants";
 import { RoomFilters } from "@/types/rooms";
 
@@ -38,6 +40,23 @@ export function FiltersPanel({
   onMySchedulesToggle,
   onNavigateWeek,
 }: FiltersPanelProps) {
+  const [buildings, setBuildings] = useState<string[]>(BUILDINGS);
+
+  useEffect(() => {
+    const fetchBuildings = async () => {
+      try {
+        const res = await apiRequest("GET", "/api/rooms/buildings");
+        const data = await res.json();
+        setBuildings(data);
+      } catch (error) {
+        console.error("Failed to fetch buildings", error);
+        setBuildings(BUILDINGS); // Fallback to default buildings
+      }
+    };
+
+    fetchBuildings();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -57,7 +76,7 @@ export function FiltersPanel({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Buildings</SelectItem>
-                {BUILDINGS.map((building) => (
+                {buildings.map((building) => (
                   <SelectItem key={building} value={building}>
                     {building}
                   </SelectItem>
