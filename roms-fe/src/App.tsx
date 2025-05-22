@@ -7,6 +7,7 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import BookingPage from "@/pages/booking-page"; // Import BookingPage
 import { AuthProvider } from "./hooks/use-auth";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (
@@ -18,7 +19,7 @@ function Router() {
       <Route path="/home" component={HomePage} />
 
       {/* Booking Page Route */}
-      <Route path="/booking" component={BookingPage} />
+      <ProtectedRoute path="/booking" component={BookingPage} />
 
       <Route component={NotFound} />
     </Switch>

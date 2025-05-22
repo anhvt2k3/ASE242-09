@@ -18,10 +18,25 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { insertUserSchema } from "@shared/schema";
 
-// Login schema
-const loginSchema = insertUserSchema.pick({
-  username: true,
-  password: true,
+const loginSchema = z.object({
+  username: z
+    .string()
+    .min(1, 'Username is required')
+    .max(200, 'Username cannot exceed 200 characters')
+    .email('Username must be a valid email address')
+    .refine(
+      (value) => !/[<>;"'()`]/.test(value),
+      'Username cannot contain special characters like <, >, ;, ", \', (, ), or `'
+    ),
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    // .min(8, 'Password must be at least 8 characters')
+    .max(100, 'Password cannot exceed 100 characters')
+    .refine(
+      (value) => !/[<>;"'()`]/.test(value),
+      'Password cannot contain special characters like <, >, ;, ", \', (, ), or `'
+    ),
 });
 
 // Registration schema with password confirmation
@@ -137,7 +152,7 @@ export function AuthForm() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-1 mb-6">
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="register">Register</TabsTrigger>
         </TabsList>
@@ -153,11 +168,11 @@ export function AuthForm() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel className="text-neutral-700">Username</FormLabel>
                     <FormControl>
                       <Input placeholder="username" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[12px] text-red-600 font-semibold"/>
                   </FormItem>
                 )}
               />
@@ -169,7 +184,7 @@ export function AuthForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-neutral-700">Password</FormLabel>
                       <a
                         href="#"
                         className="text-sm text-primary hover:text-primary/90"
@@ -184,7 +199,7 @@ export function AuthForm() {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[12px] text-red-600 font-semibold"/>
                   </FormItem>
                 )}
               />

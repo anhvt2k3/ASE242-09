@@ -42,10 +42,7 @@ export function UserNav() {
           className="relative flex items-center space-x-2 p-1"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={user?.avatarUrl || ""}
-              alt={user?.displayName || "User"}
-            />
+            <AvatarImage src={user?.displayName || "User"} />
             <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
           </Avatar>
           <span className="text-sm text-muted-foreground">
