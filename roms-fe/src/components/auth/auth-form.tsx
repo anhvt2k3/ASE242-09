@@ -47,7 +47,7 @@ const registerSchema = z
     confirmPassword: z.string(),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    role: z.enum(["student", "lecturer"]).default("student"), // Add role selection
+    role: z.enum(["student", "lecturer", "staff"]).default("student"), // Add role selection
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -119,7 +119,10 @@ export function AuthForm() {
     const endpoint =
       data.role === "lecturer"
         ? "api/auth/lecturer/signup"
-        : "api/auth/student/signup";
+        : 
+      data.role === "student"
+        ? "api/auth/student/signup"
+        : "api/auth/staff/signup";
 
     registerMutation.mutate(
       { ...apiData, endpoint },
@@ -319,6 +322,15 @@ export function AuthForm() {
                             onChange={() => field.onChange("lecturer")}
                           />
                           <span>Lecturer</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            value="staff"
+                            checked={field.value === "staff"}
+                            onChange={() => field.onChange("staff")}
+                          />
+                          <span>Staff</span>
                         </label>
                       </div>
                     </FormControl>
