@@ -537,7 +537,7 @@ export default function BookingPage() {
   try {
     // 2. Check lecturer (user) availability
     const lecturerRes = await apiRequest(
-      "GET",
+      "POST",
       `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
     );
     const lecturerData = await lecturerRes.json();

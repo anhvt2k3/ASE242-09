@@ -20,7 +20,6 @@ export async function apiRequest(
     headers: 
         {
           "Content-Type": "application/json",
-          "X-Custom-Header": "force-preflight",
           "ngrok-skip-browser-warning": "true",
         },
     body: data ? JSON.stringify(data) : undefined,
