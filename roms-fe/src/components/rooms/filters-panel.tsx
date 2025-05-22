@@ -86,27 +86,6 @@ export function FiltersPanel({
             </Select>
           </div>
 
-          {/* Room Type Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Room Type</label>
-            <Select
-              value={filters.type}
-              onValueChange={(value) => onFilterChange("type", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {ROOM_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Room Number Search */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Room Number</label>
