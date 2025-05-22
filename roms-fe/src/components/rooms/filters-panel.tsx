@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
 
-import { BUILDINGS, ROOM_TYPES } from "@/lib/constants";
+import { BUILDINGS, CAMPUSES, ROOM_TYPES } from "@/lib/constants";
 import { RoomFilters } from "@/types/rooms";
 
 interface FiltersPanelProps {
@@ -45,6 +45,26 @@ export function FiltersPanel({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Campus Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Campus</label>
+            <Select
+              value={filters.type || "all"}
+              onValueChange={(value) => onFilterChange("type", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Campuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Campuses</SelectItem>
+                {CAMPUSES.map((campus) => (
+                  <SelectItem key={campus} value={campus}>
+                    {campus}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           {/* Building Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Building</label>
