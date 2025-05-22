@@ -536,8 +536,7 @@ export default function BookingPage() {
     const endSession = Math.max(...selectedSlots);
 
     try {
-      InputValidationService.cleanseInput(description);
-      InputValidationService.cleanseInput(courseCode);
+      setDescription(InputValidationService.cleanseInput(description));
       // 2. Check lecturer (user) availability
       const lecturerRes = await apiRequest(
         "GET",

@@ -22,7 +22,7 @@ class GeneralStringValidationStrategy implements ValidationStrategy {
   private schema = z
     .string()
     // .min(1, 'Input is required')
-    .max(200, 'Input cannot exceed 500 characters')
+    .max(500, 'Input cannot exceed 500 characters')
     .refine(
       (value) => !/[<>;"'()`]/.test(value),
       'Input cannot contain special characters like <, >, ;, ", \', (, ), or `'
