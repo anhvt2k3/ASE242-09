@@ -435,7 +435,7 @@ export default function BookingPage() {
   const [building, setBuilding] = useState("");
   const [name, setName] = useState("");
   const [location] = useLocation();
-  const [roomId, setRoomId] = useState<number | null>(null);
+  const [roomId, setRoomId] = useState<string | null>(null);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
   const [courseCode, setCourseCode] = useState("");
@@ -446,7 +446,7 @@ export default function BookingPage() {
   const [suggestions, setSuggestions] = useState<{ value: string }[]>([]);
   const [availableSlots, setAvailableSlots] = useState<number[]>([]);
   const [initialBuilding, setInitialBuilding] = useState<string | null>(null);
-  const [initialRoomId, setInitialRoomId] = useState<number | null>(null);
+  const [initialRoomId, setInitialRoomId] = useState<string | null>(null);
 
   const [buildings, setBuildings] = useState<string[]>([]);
   const [rooms, setRooms] = useState<{ id: number; name: string }[]>([]);
@@ -581,8 +581,7 @@ export default function BookingPage() {
 
     if (buildingParam) setInitialBuilding(buildingParam);
     if (roomParam) {
-      const id = parseInt(roomParam);
-      if (!isNaN(id)) setInitialRoomId(id);
+      setInitialRoomId(roomParam);
     }
   }, []);
 
@@ -597,10 +596,10 @@ useEffect(() => {
   if (
     initialRoomId !== null &&
     rooms.length > 0 &&
-    rooms.some((r) => r.id === initialRoomId)
+    rooms.some((r) => r.name === initialRoomId)
   ) {
     setRoomId(initialRoomId);
-    const found = rooms.find((r) => r.id === initialRoomId);
+    const found = rooms.find((r) => r.name === initialRoomId);
     if (found) setName(found.name);
     setInitialRoomId(null);
   }
@@ -793,7 +792,7 @@ useEffect(() => {
                   onChange={(value) => {
                     setName(value);
                     const selected = rooms.find((r) => r.name === value);
-                    setRoomId(selected?.id || null);
+                    setRoomId(selected?.name || null);
                   }}
                   placeholder="Select room"
                   disabled={!building}
