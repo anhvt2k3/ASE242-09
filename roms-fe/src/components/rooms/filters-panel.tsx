@@ -1,6 +1,12 @@
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -19,7 +25,7 @@ interface FiltersPanelProps {
   weekEnd: Date;
   onFilterChange: (key: string, value: string) => void;
   onMySchedulesToggle: (checked: boolean) => void;
-  onNavigateWeek: (direction: 'prev' | 'next') => void;
+  onNavigateWeek: (direction: "prev" | "next") => void;
 }
 
 export function FiltersPanel({
@@ -30,7 +36,7 @@ export function FiltersPanel({
   weekEnd,
   onFilterChange,
   onMySchedulesToggle,
-  onNavigateWeek
+  onNavigateWeek,
 }: FiltersPanelProps) {
   return (
     <Card>
@@ -59,7 +65,7 @@ export function FiltersPanel({
               </SelectContent>
             </Select>
           </div>
-          
+
           {/* Room Type Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Room Type</label>
@@ -80,7 +86,7 @@ export function FiltersPanel({
               </SelectContent>
             </Select>
           </div>
-          
+
           {/* Room Number Search */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Room Number</label>
@@ -95,13 +101,13 @@ export function FiltersPanel({
             </div>
           </div>
         </div>
-        
+
         {/* Second row of filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
           {/* View Type (Day/Week) */}
           <div className="space-y-2">
             <label className="text-sm font-medium">View</label>
-            <Tabs 
+            <Tabs
               value={filters.period}
               onValueChange={(value) => onFilterChange("period", value)}
               className="w-full"
@@ -112,7 +118,7 @@ export function FiltersPanel({
               </TabsList>
             </Tabs>
           </div>
-          
+
           {/* Session Filter (Morning/Afternoon) - Show only in Day view */}
           {filters.period === "day" && (
             <div className="space-y-2">
@@ -132,7 +138,7 @@ export function FiltersPanel({
               </Select>
             </div>
           )}
-          
+
           {/* Date Picker */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Date</label>
@@ -147,61 +153,62 @@ export function FiltersPanel({
               </div>
             ) : (
               <div className="flex items-center gap-1">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="icon"
-                  onClick={() => onNavigateWeek('prev')}
+                  onClick={() => onNavigateWeek("prev")}
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke-width="1.5" 
-                    stroke="currentColor" 
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
                     className="size-6"
                   >
-                    <path 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      d="M15.75 19.5 8.25 12l7.5-7.5" 
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15.75 19.5 8.25 12l7.5-7.5"
                     />
                   </svg>
                 </Button>
-                
+
                 <div className="px-2 py-2 border rounded-md flex-1 text-center text-sm">
-                  {format(weekStart, "MMM dd")} - {format(weekEnd, "MMM dd, yyyy")}
+                  {format(weekStart, "MMM dd")} -{" "}
+                  {format(weekEnd, "MMM dd, yyyy")}
                 </div>
 
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="icon"
-                  onClick={() => onNavigateWeek('next')}
+                  onClick={() => onNavigateWeek("next")}
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke-width="1.5" 
-                    stroke="currentColor" 
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
                     className="size-6"
                   >
-                    <path 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      d="m8.25 4.5 7.5 7.5-7.5 7.5" 
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
                     />
                   </svg>
                 </Button>
               </div>
             )}
           </div>
-          
+
           {/* My schedules filter (only for lecturers) */}
-          {user && (
+          {user && user.role === "lecturer" && (
             <div className="space-y-2 flex items-end ml-2">
               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="mySchedules" 
+                <Checkbox
+                  id="mySchedules"
                   checked={showMySchedules}
                   onCheckedChange={onMySchedulesToggle}
                 />
