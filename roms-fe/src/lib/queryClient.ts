@@ -37,7 +37,13 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const res = await fetch(env.VITE_BE_DOMAIN+queryKey[0] as string, {
+    headers: 
+        {
+          "Content-Type": "application/json",
+          "X-Custom-Header": "force-preflight",
+          "ngrok-skip-browser-warning": "true",
+        },
       credentials: "include",
     });
 
