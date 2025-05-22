@@ -414,7 +414,7 @@
 // }
 
 import { useState, useEffect, useRef } from "react";
-import { useLocation } from "wouter";
+import { Redirect, useLocation } from "wouter";
 import { DatePicker, Modal, AutoComplete, Select } from "antd";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/layout/navbar";
@@ -696,6 +696,7 @@ useEffect(() => {
 
       alert("Room booking successful!");
       resetForm();
+      window.location.href = "/home";
     } catch (err) {
       console.error(err);
       alert("Failed to book room.");
