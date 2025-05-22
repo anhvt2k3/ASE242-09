@@ -118,13 +118,14 @@ export default function HomePage() {
     }
   };
   
-  const handleBookRoom = (roomId?: string, date?: string) => {
-    if (roomId && date) {
-      setLocation(`/booking?roomId=${roomId}&date=${date}`);
+  const handleBookRoom = (roomId?: string, date?: string, building?: string) => {
+    if (roomId && date && building) {
+      setLocation(`/booking?building=${encodeURIComponent(building)}&roomId=${roomId}&date=${date}`);
     } else {
       setLocation("/booking");
     }
   };
+
   
   const navigateWeek = (direction: 'prev' | 'next') => {
     const days = direction === 'prev' ? -7 : 7;

@@ -414,7 +414,7 @@
 // }
 
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "wouter";
+import { useLocation } from "wouter";
 import { DatePicker, Modal, AutoComplete, Select } from "antd";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/layout/navbar";
@@ -433,6 +433,7 @@ export default function BookingPage() {
   const [campus, setCampus] = useState("1");
   const [building, setBuilding] = useState("");
   const [name, setName] = useState("");
+  const [location] = useLocation();
   const [roomId, setRoomId] = useState<number | null>(null);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
@@ -443,6 +444,8 @@ export default function BookingPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [suggestions, setSuggestions] = useState<{ value: string }[]>([]);
   const [availableSlots, setAvailableSlots] = useState<number[]>([]);
+  const [initialBuilding, setInitialBuilding] = useState<string | null>(null);
+  const [initialRoomId, setInitialRoomId] = useState<number | null>(null);
 
   const [buildings, setBuildings] = useState<string[]>([]);
   const [rooms, setRooms] = useState<{ id: number; name: string }[]>([]);
@@ -455,6 +458,10 @@ export default function BookingPage() {
     { id: "1", name: "Campus 1" },
     { id: "2", name: "Campus 2" },
   ];
+
+
+
+
 
   useEffect(() => {
     if (!campus) return;
@@ -508,6 +515,7 @@ export default function BookingPage() {
     fetchRooms();
   }, [building, campus]);
 
+
   const handleSlotClick = (slot: number) => {
     if (!date || !roomId) return;
     setSelectedSlots((prev) =>
@@ -556,6 +564,46 @@ export default function BookingPage() {
       alert("Error checking availability. Please try again.");
     }
   };
+
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const dateParam = searchParams.get("date");
+    const buildingParam = searchParams.get("building");
+    const roomParam = searchParams.get("roomId");
+
+    if (dateParam) {
+      const parsedDate = dayjs(dateParam, "YYYY-MM-DD");
+      if (parsedDate.isValid()) setDate(parsedDate);
+    }
+
+    if (buildingParam) setInitialBuilding(buildingParam);
+    if (roomParam) {
+      const id = parseInt(roomParam);
+      if (!isNaN(id)) setInitialRoomId(id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (initialBuilding && buildings.includes(initialBuilding)) {
+      setBuilding(initialBuilding);
+      setInitialBuilding(null);
+    }
+  }, [buildings, initialBuilding]);
+
+useEffect(() => {
+  if (
+    initialRoomId !== null &&
+    rooms.length > 0 &&
+    rooms.some((r) => r.id === initialRoomId)
+  ) {
+    setRoomId(initialRoomId);
+    const found = rooms.find((r) => r.id === initialRoomId);
+    if (found) setName(found.name);
+    setInitialRoomId(null);
+  }
+}, [rooms, initialRoomId]);
+
 
   useEffect(() => {
     if (!date || !name || !campus) return;
@@ -685,7 +733,6 @@ export default function BookingPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-600">
             Room Booking
           </h1>
-
           {user && (
             <div className="mb-4 text-right text-sm text-gray-600">
               Logged in as{" "}
