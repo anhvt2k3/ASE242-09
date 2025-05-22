@@ -1,4 +1,7 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+// import { getAuthToken } from "@/auth"; // adjust the path if needed
+
+import env from "../config/env";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -10,12 +13,16 @@ async function throwIfResNotOk(res: Response) {
 export async function apiRequest(
   method: string,
   url: string,
-  data?: unknown | undefined,
+  data?: unknown | undefined
 ): Promise<Response> {
-  const baseUrl = "https://localhost:7288";
-  const res = await fetch(`${baseUrl}${url}`, {
+  const res = await fetch(`${env.VITE_BE_DOMAIN}${url}`, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: data
+      ? {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        }
+      : {},
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });

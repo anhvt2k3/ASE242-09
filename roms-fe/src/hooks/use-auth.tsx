@@ -9,7 +9,7 @@ import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-const API_BASE_URL = "https://localhost:7288";
+const API_BASE_URL = "https://localhost:7288"; // Replace with your actual API base URL
 
 // Extend the User type to include isGuest flag
 type AuthUser = Partial<User> & { isGuest?: boolean };

@@ -1,0 +1,3 @@
+export function getAuthToken() {
+  return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW52YW5hQGV4YW1wbGUuY29tIiwicm9sZSI6W3siYXV0aG9yaXR5IjoiUk9MRV9MRUNUVVJFUiJ9XSwiaWF0IjoxNzQ3ODM0MDQ1LCJleHAiOjE3NTE0MzQwNDV9.NZzDjQhb-cSfx-PLzTfxU6D-7gqlpspz5aVBjNPTjRM";
+}
