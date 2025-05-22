@@ -541,7 +541,6 @@ export default function BookingPage() {
         `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
       );
       const lecturerData = await lecturerRes.json();
-      console.log("Lecturer availability response:", lecturerData);
       const isLecturerAvailable = lecturerData.available ?? true;
 
       if (!isLecturerAvailable) {
