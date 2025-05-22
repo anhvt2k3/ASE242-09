@@ -25,16 +25,25 @@ export function ScheduleTable({
   weekDates,
   weekStart,
   weekEnd,
-  onBookRoom
+  onBookRoom,
 }: ScheduleTableProps) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           Room Schedules
-          {filters.period === "day" && ` for ${format(parseISO(filters.date), "MMMM d, yyyy")}`}
-          {filters.period === "week" && ` for Week of ${format(weekStart, "MMMM d")} - ${format(weekEnd, "d, yyyy")}`}
-          {filters.session && filters.session !== "all" && ` (${filters.session === "morning" ? "Morning" : "Afternoon"} Sessions)`}
+          {filters.period === "day" &&
+            ` for ${format(parseISO(filters.date), "MMMM d, yyyy")}`}
+          {filters.period === "week" &&
+            ` for Week of ${format(weekStart, "MMMM d")} - ${format(
+              weekEnd,
+              "d, yyyy"
+            )}`}
+          {filters.session &&
+            filters.session !== "all" &&
+            ` (${
+              filters.session === "morning" ? "Morning" : "Afternoon"
+            } Sessions)`}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -44,14 +53,24 @@ export function ScheduleTable({
           </div>
         ) : !rooms?.length ? (
           <div className="text-center p-12">
-            <h3 className="text-lg text-muted-foreground font-medium">No schedule found</h3>
+            <h3 className="text-lg text-muted-foreground font-medium">
+              No schedule found
+            </h3>
           </div>
         ) : (
           <div className="overflow-x-auto">
             {filters.period === "day" ? (
-              <DailyScheduleTable rooms={rooms} filters={filters} onBookRoom={onBookRoom}/>
+              <DailyScheduleTable
+                rooms={rooms}
+                filters={filters}
+                onBookRoom={onBookRoom}
+              />
             ) : (
-              <WeeklyScheduleTable rooms={rooms} weekDates={weekDates} onBookRoom={onBookRoom} />
+              <WeeklyScheduleTable
+                rooms={rooms}
+                weekDates={weekDates}
+                onBookRoom={onBookRoom}
+              />
             )}
           </div>
         )}
@@ -60,14 +79,14 @@ export function ScheduleTable({
   );
 }
 
-function DailyScheduleTable({ 
-  rooms, 
+function DailyScheduleTable({
+  rooms,
   filters,
-  onBookRoom
-}: { 
-  rooms: RoomWithSchedule[], 
-  filters: RoomFilters,
-  onBookRoom: (roomId: string, date: string) => void
+  onBookRoom,
+}: {
+  rooms: RoomWithSchedule[];
+  filters: RoomFilters;
+  onBookRoom: (roomId: string, date: string) => void;
 }) {
   const { user } = useAuth();
 
@@ -78,22 +97,22 @@ function DailyScheduleTable({
           <th className="p-3 text-left font-medium">Room</th>
           <th className="p-3 text-left font-medium">Building</th>
           <th className="p-3 text-left font-medium">Type</th>
-          {TIME_SLOTS
-            .filter(slot => {
-              // Filter slots based on session if specified
-              if (filters.session === "morning") {
-                return ["slot1", "slot2", "slot3"].includes(slot.id);
-              } else if (filters.session === "afternoon") {
-                return ["slot4", "slot5", "slot6"].includes(slot.id);
-              }
-              return true;
-            })
-            .map((slot) => (
-              <th key={slot.id} className="p-3 text-center font-medium min-w-[120px]">
-                {slot.label}
-              </th>
-            ))
-          }
+          {TIME_SLOTS.filter((slot) => {
+            // Filter slots based on session if specified
+            if (filters.session === "morning") {
+              return ["slot1", "slot2", "slot3"].includes(slot.id);
+            } else if (filters.session === "afternoon") {
+              return ["slot4", "slot5", "slot6"].includes(slot.id);
+            }
+            return true;
+          }).map((slot) => (
+            <th
+              key={slot.id}
+              className="p-3 text-center font-medium min-w-[120px]"
+            >
+              {slot.label}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
@@ -102,56 +121,59 @@ function DailyScheduleTable({
             <td className="p-3 font-medium">{room.roomNumber}</td>
             <td className="p-3">{room.building}</td>
             <td className="p-3">{room.type}</td>
-            {TIME_SLOTS
-              .filter(slot => {
-                // Filter slots based on session if specified
-                if (filters.session === "morning") {
-                  return ["slot1", "slot2", "slot3"].includes(slot.id);
-                } else if (filters.session === "afternoon") {
-                  return ["slot4", "slot5", "slot6"].includes(slot.id);
-                }
-                return true;
-              })
-              .map((slot) => {
-                const schedule = getRoomScheduleForTimeAndDay(
-                  room, 
-                  slot.value, 
-                  filters.date
-                );
-                
-                return (
-                  <td 
-                    key={`${room.id}-${slot.id}`} 
-                    className={cn(
-                      "p-3 text-center", 
-                      schedule ? "bg-primary/10" : "bg-green-50/30"
-                    )}
-                  >
-                    {schedule ? (
-                      <div className="flex flex-col gap-1">
-                        <span className="font-medium text-sm">{schedule.subject}</span>
-                        <span className="text-xs text-muted-foreground">{schedule.lecturer.name}</span>
+            {TIME_SLOTS.filter((slot) => {
+              // Filter slots based on session if specified
+              if (filters.session === "morning") {
+                return ["slot1", "slot2", "slot3"].includes(slot.id);
+              } else if (filters.session === "afternoon") {
+                return ["slot4", "slot5", "slot6"].includes(slot.id);
+              }
+              return true;
+            }).map((slot) => {
+              const schedule = getRoomScheduleForTimeAndDay(
+                room,
+                slot.value,
+                filters.date
+              );
+
+              return (
+                <td
+                  key={`${room.id}-${slot.id}`}
+                  className={cn(
+                    "p-3 text-center",
+                    schedule ? "bg-primary/10" : "bg-green-50/30"
+                  )}
+                >
+                  {schedule ? (
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium text-sm">
+                        {schedule.subject}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {schedule.lecturer.name}
+                      </span>
+                    </div>
+                  ) : user ? (
+                    <button
+                      onClick={() => onBookRoom(room.id, filters.date)}
+                      className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
+                    >
+                      <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
+                        Available
+                      </span>
+                      <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                        <PlusCircle className="h-3 w-3 text-green-600" />
+                        <span className="text-green-600 text-xs">Book</span>
                       </div>
-                    ) : (
-                      user ? (
-                        <button
-                          onClick={() => onBookRoom(room.id, filters.date)}
-                          className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
-                        >
-                          <span className="text-green-600 text-xs font-medium group-hover:text-green-700">Available</span>
-                          <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                            <PlusCircle className="h-3 w-3 text-green-600" />
-                            <span className="text-green-600 text-xs">Book</span>
-                          </div>
-                        </button>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">No Session</span>
-                      )
-                    )}
-                  </td>
-                );
-              })
-            }
+                    </button>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">
+                      No Session
+                    </span>
+                  )}
+                </td>
+              );
+            })}
           </tr>
         ))}
       </tbody>
@@ -159,14 +181,14 @@ function DailyScheduleTable({
   );
 }
 
-function WeeklyScheduleTable({ 
-  rooms, 
-  weekDates, 
-  onBookRoom 
-}: { 
-  rooms: RoomWithSchedule[], 
-  weekDates: Date[] ,
-  onBookRoom: (roomId: string, date: string) => void
+function WeeklyScheduleTable({
+  rooms,
+  weekDates,
+  onBookRoom,
+}: {
+  rooms: RoomWithSchedule[];
+  weekDates: Date[];
+  onBookRoom: (roomId: string, date: string) => void;
 }) {
   const { user } = useAuth();
 
@@ -177,7 +199,7 @@ function WeeklyScheduleTable({
           <th className="p-3 text-left font-medium">Room</th>
           <th className="p-3 text-left font-medium">Building</th>
           {weekDates.map((date) => (
-            <th 
+            <th
               key={format(date, "yyyy-MM-dd")}
               className={cn(
                 "p-3 text-center font-medium min-w-[150px]",
@@ -198,11 +220,11 @@ function WeeklyScheduleTable({
             {weekDates.map((date) => {
               const dayStr = format(date, "yyyy-MM-dd");
               const daySchedules = room.schedules.filter(
-                schedule => schedule.day === dayStr
+                (schedule) => schedule.day === dayStr
               );
-              
+
               return (
-                <td 
+                <td
                   key={`${room.id}-${dayStr}`}
                   className={cn(
                     "p-2 align-top",
@@ -213,35 +235,37 @@ function WeeklyScheduleTable({
                     {daySchedules.length > 0 ? (
                       <div className="space-y-1">
                         {daySchedules.map((schedule) => (
-                          <div 
-                            key={schedule.id} 
+                          <div
+                            key={schedule.id}
                             className="bg-primary/10 p-2 rounded text-xs"
                           >
                             <div className="font-medium">
                               {schedule.startTime} - {schedule.endTime}
                             </div>
                             <div>{schedule.subject}</div>
-                            <div className="text-muted-foreground">{schedule.lecturer.name}</div>
+                            <div className="text-muted-foreground">
+                              {schedule.lecturer.name}
+                            </div>
                           </div>
                         ))}
                       </div>
+                    ) : user?.role == "lecturer" ? (
+                      <button
+                        onClick={() => onBookRoom(room.id, dayStr)}
+                        className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
+                      >
+                        <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
+                          Available
+                        </span>
+                        <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
+                          <PlusCircle className="h-3 w-3" />
+                          <span>Book</span>
+                        </div>
+                      </button>
                     ) : (
-                      user?.role=='lecturer' ? (
-                        <button
-                          onClick={() => onBookRoom(room.id, dayStr)}
-                          className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
-                        >
-                          <span className="text-green-600 text-xs font-medium group-hover:text-green-700">Available</span>
-                          <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
-                            <PlusCircle className="h-3 w-3" />
-                            <span>Book</span>
-                          </div>
-                        </button>
-                      ) : (
                       <div className="text-center text-xs text-muted-foreground pt-4">
                         No Session
                       </div>
-                    )
                     )}
                   </div>
                 </td>

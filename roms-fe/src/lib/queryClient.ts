@@ -1,23 +1,28 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 // import { getAuthToken } from "@/auth"; // adjust the path if needed
 
-import env from '../config/env'
+import env from "../config/env";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
-} 
+}
 
 export async function apiRequest(
   method: string,
   url: string,
-  data?: unknown | undefined,
+  data?: unknown | undefined
 ): Promise<Response> {
   const res = await fetch(`${env.VITE_BE_DOMAIN}${url}`, {
     method,
-    headers: method != 'GET' ? { "Content-Type": "application/json" } : {},
+    headers: 
+        {
+          "Content-Type": "application/json",
+          "X-Custom-Header": "force-preflight",
+          "ngrok-skip-browser-warning": "true",
+        },
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -32,7 +37,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(env.VITE_BE_DOMAIN+queryKey[0] as string, {
+    const res = await fetch(queryKey[0] as string, {
       credentials: "include",
     });
 

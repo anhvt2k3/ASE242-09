@@ -413,9 +413,6 @@
 //   );
 // }
 
-
-
-
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "wouter";
 import { DatePicker, Modal, AutoComplete, Select } from "antd";
@@ -464,7 +461,10 @@ export default function BookingPage() {
 
     const fetchBuildings = async () => {
       try {
-        const res = await apiRequest("POST", `/api/roomschedules/buildingByCampus?campus=${campus}`);
+        const res = await apiRequest(
+          "POST",
+          `/api/roomschedules/buildingByCampus?campus=${campus}`
+        );
         const data = await res.json();
         setBuildings(data.filter((b: string) => b != null && b !== ""));
         setBuilding("");
@@ -479,32 +479,34 @@ export default function BookingPage() {
     fetchBuildings();
   }, [campus]);
 
-useEffect(() => {
-  if (!building || !campus) return;
+  useEffect(() => {
+    if (!building || !campus) return;
 
-  const fetchRooms = async () => {
-    try {
-      const res = await apiRequest("POST", `/api/roomschedules/nameByBuilding?building=${building}&campus=${campus}`);
-      const data = await res.json();
-      //console.log("Fetched rooms:", data);
+    const fetchRooms = async () => {
+      try {
+        const res = await apiRequest(
+          "POST",
+          `/api/roomschedules/nameByBuilding?building=${building}&campus=${campus}`
+        );
+        const data = await res.json();
+        //console.log("Fetched rooms:", data);
 
-      if (Array.isArray(data) && typeof data[0] === "string") {
-        // Convert string array to objects with ids
-        setRooms(data.map((name, idx) => ({ id: idx, name })));
-      } else {
-        setRooms(Array.isArray(data) ? data : data.rooms || []);
+        if (Array.isArray(data) && typeof data[0] === "string") {
+          // Convert string array to objects with ids
+          setRooms(data.map((name, idx) => ({ id: idx, name })));
+        } else {
+          setRooms(Array.isArray(data) ? data : data.rooms || []);
+        }
+
+        setName("");
+        setRoomId(null);
+      } catch (error) {
+        console.error("Failed to fetch rooms", error);
       }
+    };
 
-      setName("");
-      setRoomId(null);
-    } catch (error) {
-      console.error("Failed to fetch rooms", error);
-    }
-  };
-
-  fetchRooms();
-}, [building, campus]);
-
+    fetchRooms();
+  }, [building, campus]);
 
   const handleSlotClick = (slot: number) => {
     if (!date || !roomId) return;
@@ -514,23 +516,23 @@ useEffect(() => {
   };
 
   const handleConfirmClick = async () => {
-  if (
-    !campus ||
-    !building ||
-    !name ||
-    !roomId ||
-    !date ||
-    selectedSlots.length === 0 ||
-    !courseCode.trim() ||
-    !courseName.trim()
-  ) {
-    alert("Please fill in all required fields.");
-    return;
-  }
+    if (
+      !campus ||
+      !building ||
+      !name ||
+      !roomId ||
+      !date ||
+      selectedSlots.length === 0 ||
+      !courseCode.trim() ||
+      !courseName.trim()
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
 
-  const formattedDate = date.format("YYYY-MM-DD");
-  const startSession = Math.min(...selectedSlots);
-  const endSession = Math.max(...selectedSlots);
+    const formattedDate = date.format("YYYY-MM-DD");
+    const startSession = Math.min(...selectedSlots);
+    const endSession = Math.max(...selectedSlots);
 
   try {
     // 2. Check lecturer (user) availability
@@ -541,77 +543,83 @@ useEffect(() => {
     const lecturerData = await lecturerRes.json();
     const isLecturerAvailable = lecturerData.available ?? true;
 
-    if (!isLecturerAvailable) {
-      alert("You are already booked during these sessions. Please choose different slots.");
-      return;
-    }
-
-    setIsModalVisible(true); // All checks passed, show confirmation modal
-  } catch (err) {
-    console.error(err);
-    alert("Error checking availability. Please try again.");
-  }
-};
-
-useEffect(() => {
-  if (!date || !name || !campus) return;
-
-  const fetchAvailableSlots = async () => {
-    try {
-      const formattedDate = date.format("YYYY-MM-DD");
-      const res = await apiRequest(
-        "POST",
-        `/api/roomschedules/available/${formattedDate}?campus=${campus}&name=${encodeURIComponent(name)}`
-      );
-      const data = await res.json();
-      console.log("Room availability response:", data);
-      const slots = Array.isArray(data) ? data : [];
-      setAvailableSlots(slots);
-      console.log("Fetched available slots:", slots);
-    } catch (error) {
-      console.error("Error fetching available slots:", error);
-      setAvailableSlots([]);
-    }
-  };
-
-  fetchAvailableSlots();
-}, [date, name, campus]);
-
-
-
-useEffect(() => {
-  if (!courseCode.trim()) {
-    setCourseName("");
-    return;
-  }
-
-  if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-
-  debounceTimeout.current = setTimeout(async () => {
-    setLoadingCourseName(true);
-    try {
-      const res = await apiRequest("POST", `/api/roomschedules/getsubject/${encodeURIComponent(courseCode.trim())}`);
-      if (!res.ok) {
-        setCourseName("");
-        setLoadingCourseName(false);
+      if (!isLecturerAvailable) {
+        alert(
+          "You are already booked during these sessions. Please choose different slots."
+        );
         return;
       }
 
-      const data = await res.json();
-      setCourseName(data.subjectName || "");
-    } catch (error) {
-      console.error("Error fetching course name:", error);
-      setCourseName("");
-    } finally {
-      setLoadingCourseName(false);
+      setIsModalVisible(true); // All checks passed, show confirmation modal
+    } catch (err) {
+      console.error(err);
+      alert("Error checking availability. Please try again.");
     }
-  }, 500);
-
-  return () => {
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
   };
-}, [courseCode]);
 
+  useEffect(() => {
+    if (!date || !name || !campus) return;
+
+    const fetchAvailableSlots = async () => {
+      try {
+        const formattedDate = date.format("YYYY-MM-DD");
+        const res = await apiRequest(
+          "POST",
+          `/api/roomschedules/available/${formattedDate}?campus=${campus}&name=${encodeURIComponent(
+            name
+          )}`
+        );
+        const data = await res.json();
+        console.log("Room availability response:", data);
+        const slots = Array.isArray(data) ? data : [];
+        setAvailableSlots(slots);
+        console.log("Fetched available slots:", slots);
+      } catch (error) {
+        console.error("Error fetching available slots:", error);
+        setAvailableSlots([]);
+      }
+    };
+
+    fetchAvailableSlots();
+  }, [date, name, campus]);
+
+  useEffect(() => {
+    if (!courseCode.trim()) {
+      setCourseName("");
+      return;
+    }
+
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    debounceTimeout.current = setTimeout(async () => {
+      setLoadingCourseName(true);
+      try {
+        const res = await apiRequest(
+          "POST",
+          `/api/roomschedules/getsubject/${encodeURIComponent(
+            courseCode.trim()
+          )}`
+        );
+        if (!res.ok) {
+          setCourseName("");
+          setLoadingCourseName(false);
+          return;
+        }
+
+        const data = await res.json();
+        setCourseName(data.subjectName || "");
+      } catch (error) {
+        console.error("Error fetching course name:", error);
+        setCourseName("");
+      } finally {
+        setLoadingCourseName(false);
+      }
+    }, 500);
+
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
+  }, [courseCode]);
 
   const handleFinalConfirm = async () => {
     setIsModalVisible(false);
@@ -631,14 +639,9 @@ useEffect(() => {
         name,
         building,
         campus,
-        roomId,
-        subjectId: 1,
-        courseCode,
-        courseName,
-        description,
+        subjectCode: courseCode,
         startSession,
         endSession,
-        autoToggle,
       });
 
       alert("Room booking successful!");
@@ -668,9 +671,6 @@ useEffect(() => {
       return;
     }
 
-
-      
-
     const filtered = ["CO2001", "CO1005", "CO3001", "CO3002", "IM1013"]
       .filter((code) => code.toLowerCase().includes(courseCode.toLowerCase()))
       .map((code) => ({ value: code }));
@@ -682,19 +682,26 @@ useEffect(() => {
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 p-4 flex items-center justify-center">
         <div className="w-full max-w-4xl bg-white rounded-xl shadow-md p-6 md:p-8 space-y-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-600">Room Booking</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-600">
+            Room Booking
+          </h1>
 
           {user && (
             <div className="mb-4 text-right text-sm text-gray-600">
-              Logged in as <span className="font-semibold">{user.username}</span>
+              Logged in as{" "}
+              <span className="font-semibold">{user.username}</span>
             </div>
           )}
 
           <div className="border p-4 rounded-lg bg-blue-50">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Room Selection</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Room Selection
+            </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Campus</label>
+                <label className="block text-sm text-gray-700 mb-1">
+                  Campus
+                </label>
                 <Select
                   className="w-full"
                   value={campus}
@@ -702,12 +709,16 @@ useEffect(() => {
                   placeholder="Select campus"
                 >
                   {campusList.map((c) => (
-                    <Option key={c.id} value={c.id}>{c.name}</Option>
+                    <Option key={c.id} value={c.id}>
+                      {c.name}
+                    </Option>
                   ))}
                 </Select>
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Building</label>
+                <label className="block text-sm text-gray-700 mb-1">
+                  Building
+                </label>
                 <Select
                   className="w-full"
                   value={building}
@@ -715,10 +726,12 @@ useEffect(() => {
                   placeholder="Select building"
                   disabled={!campus}
                 >
-                {buildings
-                    .filter((b) => b != null && b !== "") 
+                  {buildings
+                    .filter((b) => b != null && b !== "")
                     .map((b) => (
-                      <Option key={b} value={b}>{b}</Option>
+                      <Option key={b} value={b}>
+                        {b}
+                      </Option>
                     ))}
                 </Select>
               </div>
@@ -729,16 +742,18 @@ useEffect(() => {
                   value={name}
                   onChange={(value) => {
                     setName(value);
-                    const selected = rooms.find(r => r.name === value);
+                    const selected = rooms.find((r) => r.name === value);
                     setRoomId(selected?.id || null);
                   }}
                   placeholder="Select room"
                   disabled={!building}
                 >
-                {rooms
-                    .filter((r) => r.name != null && r.name !== "") 
+                  {rooms
+                    .filter((r) => r.name != null && r.name !== "")
                     .map((r) => (
-                      <Option key={r.id} value={r.name}>{r.name}</Option>
+                      <Option key={r.id} value={r.name}>
+                        {r.name}
+                      </Option>
                     ))}
                 </Select>
               </div>
@@ -746,12 +761,16 @@ useEffect(() => {
           </div>
 
           <div className="border p-4 rounded-lg space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Booking Date</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Booking Date
+            </h2>
             <DatePicker className="w-full" value={date} onChange={setDate} />
           </div>
 
           <div className="border p-4 rounded-lg space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Select Slots</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Select Slots
+            </h2>
             <div className="grid grid-cols-4 gap-2">
               {Array.from({ length: 16 }, (_, i) => i + 1).map((slot) => {
                 const isAvailable = availableSlots.includes(slot);
@@ -777,14 +796,17 @@ useEffect(() => {
                   </button>
                 );
               })}
-
             </div>
           </div>
 
           <div className="border p-4 rounded-lg space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">Course Details</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Course Details
+            </h2>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Course Code</label>
+              <label className="block text-sm text-gray-700 mb-1">
+                Course Code
+              </label>
               <AutoComplete
                 className="w-full"
                 options={suggestions}
@@ -794,7 +816,9 @@ useEffect(() => {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1 mt-4">Course Name</label>
+              <label className="block text-sm text-gray-700 mb-1 mt-4">
+                Course Name
+              </label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-2"
@@ -803,13 +827,17 @@ useEffect(() => {
                 readOnly
               />
               {loadingCourseName && (
-                <p className="text-sm text-gray-500 mt-1">Loading course name...</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Loading course name...
+                </p>
               )}
             </div>
           </div>
 
           <div className="border p-4 rounded-lg">
-            <label className="block text-sm text-gray-700 mb-1">Description</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Description
+            </label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2"
               rows={3}
@@ -857,15 +885,35 @@ useEffect(() => {
           cancelText="Cancel"
         >
           <div className="space-y-2 text-gray-800">
-            <p><strong>Campus:</strong> {campus}</p>
-            <p><strong>Building:</strong> {building}</p>
-            <p><strong>Room:</strong> {name}</p>
-            <p><strong>Date:</strong> {date?.format("DD/MM/YYYY")}</p>
-            <p><strong>Slots:</strong> {selectedSlots.join(", ")}</p>
-            <p><strong>Course Code:</strong> {courseCode}</p>
-            <p><strong>Course Name:</strong> {courseName}</p>
-            {description && <p><strong>Content:</strong> {description}</p>}
-            <p><strong>Auto Device Toggle:</strong> {autoToggle ? "Yes" : "No"}</p>
+            <p>
+              <strong>Campus:</strong> {campus}
+            </p>
+            <p>
+              <strong>Building:</strong> {building}
+            </p>
+            <p>
+              <strong>Room:</strong> {name}
+            </p>
+            <p>
+              <strong>Date:</strong> {date?.format("DD/MM/YYYY")}
+            </p>
+            <p>
+              <strong>Slots:</strong> {selectedSlots.join(", ")}
+            </p>
+            <p>
+              <strong>Course Code:</strong> {courseCode}
+            </p>
+            <p>
+              <strong>Course Name:</strong> {courseName}
+            </p>
+            {description && (
+              <p>
+                <strong>Content:</strong> {description}
+              </p>
+            )}
+            <p>
+              <strong>Auto Device Toggle:</strong> {autoToggle ? "Yes" : "No"}
+            </p>
           </div>
         </Modal>
       </div>

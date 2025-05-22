@@ -20,6 +20,7 @@ export type Schedule = {
   day: string;
   lecturerId: string;
   subject: string;
+  courseCode: string;
   notes?: string;
 };
 
