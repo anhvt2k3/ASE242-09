@@ -10,6 +10,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { DatabaseZap } from "lucide-react";
 import { getAuthToken } from "./auth"; // Adjust path if needed
 import { InputValidationService } from "@/lib/inputValidator";
+import { start } from "repl";
+import { toast } from "@/hooks/use-toast";
 
 const { Option } = Select;
 
@@ -29,9 +31,12 @@ export default function BookingPage() {
   const [autoToggle, setAutoToggle] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [suggestions, setSuggestions] = useState<{ value: string }[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<number[]>([]);
   const [initialBuilding, setInitialBuilding] = useState<string | null>(null);
   const [initialRoomId, setInitialRoomId] = useState<string | null>(null);
+  
+  const [availableSlots, setAvailableSlots] = useState<number[]>([]);
+  const [startSession, setStartSession] = useState<number | null>(null);
+  const [endSession, setEndSession] = useState<number | null>(null);
 
   const [buildings, setBuildings] = useState<string[]>([]);
   const [rooms, setRooms] = useState<{ id: number; name: string }[]>([]);
@@ -44,21 +49,6 @@ export default function BookingPage() {
     { id: "1", name: "Campus 1" },
     { id: "2", name: "Campus 2" },
   ];
-
- useEffect(() => {
-    const fetchSubjectCodes = async () => {
-      try {
-        const res = await apiRequest("GET", "/api/roomschedules/getsubjectcodes");
-        const data = await res.json();
-        setSubjectCodes(data.subjectCodes || []);
-      } catch (error) {
-        console.error("Failed to fetch subject codes", error);
-        setSubjectCodes(["CO2001", "CO1005", "CO3001", "CO3002", "IM1013"]);
-      }
-    };
-
-    fetchSubjectCodes();
- }, []);
 
 //  # fetch buildings having campus changes
   useEffect(() => {
@@ -133,13 +123,16 @@ export default function BookingPage() {
       !courseCode.trim() ||
       !courseName.trim()
     ) {
-      alert("Please fill in all required fields.");
+      // alert("Please fill in all required fields.");
+      toast({
+        title: "Invalid Booking",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
       return;
     }
 
     const formattedDate = date.format("YYYY-MM-DD");
-    const startSession = Math.min(...selectedSlots);
-    const endSession = Math.max(...selectedSlots);
 
     try {
       setDescription(InputValidationService.cleanseInput(description));
@@ -152,9 +145,14 @@ export default function BookingPage() {
       const isLecturerAvailable = lecturerData.available ?? true;
 
       if (!isLecturerAvailable) {
-        alert(
-          "You are already booked during these sessions. Please choose different slots."
-        );
+        // alert(
+        //   "You are already booked during these sessions. Please choose different slots."
+        // );
+        toast({
+          title: "Booking Conflict",
+          description: "You are already booked during these sessions. Please choose different slots.",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -165,6 +163,27 @@ export default function BookingPage() {
     }
   };
 
+  useEffect(() => {
+    setStartSession(selectedSlots.length > 0 ? Math.min(...selectedSlots) : null );
+    setEndSession(selectedSlots.length > 0 ? Math.max(...selectedSlots) : null );
+  }, [selectedSlots]);
+
+  useEffect(() => {
+  if (startSession && endSession) {
+    const invalidSlots = Array.from({ length: 16 }, (_, i) => i + 1).filter(
+      (slot) => !availableSlots.includes(slot) && slot >= startSession && slot <= endSession
+    );
+
+    if (invalidSlots.length > 0) {
+      setSelectedSlots([]);
+      toast({
+        title: "Invalid Slot Selection",
+        description: `The selected slots are not available. Please choose different slots.`,
+        variant: "destructive",
+      });
+    }
+  }
+}, [startSession, endSession, availableSlots]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -181,6 +200,19 @@ export default function BookingPage() {
     if (roomParam) {
       setInitialRoomId(roomParam);
     }
+    
+    const fetchSubjectCodes = async () => {
+      try {
+        const res = await apiRequest("GET", "/api/roomschedules/getsubjectcodes");
+        const data = await res.json();
+        setSubjectCodes(data.subjectCodes || []);
+      } catch (error) {
+        console.error("Failed to fetch subject codes", error);
+        setSubjectCodes(["CO2001", "CO1005", "CO3001", "CO3002", "IM1013"]);
+      }
+    };
+
+    fetchSubjectCodes();
   }, []);
 
   useEffect(() => {
@@ -190,19 +222,18 @@ export default function BookingPage() {
     }
   }, [buildings, initialBuilding]);
 
-useEffect(() => {
-  if (
-    initialRoomId !== null &&
-    rooms.length > 0 &&
-    rooms.some((r) => r.name === initialRoomId)
-  ) {
-    setRoomId(initialRoomId);
-    const found = rooms.find((r) => r.name === initialRoomId);
-    if (found) setName(found.name);
-    setInitialRoomId(null);
-  }
-}, [rooms, initialRoomId]);
-
+  useEffect(() => {
+    if (
+      initialRoomId !== null &&
+      rooms.length > 0 &&
+      rooms.some((r) => r.name === initialRoomId)
+    ) {
+      setRoomId(initialRoomId);
+      const found = rooms.find((r) => r.name === initialRoomId);
+      if (found) setName(found.name);
+      setInitialRoomId(null);
+    }
+  }, [rooms, initialRoomId]);
 
   useEffect(() => {
     if (!date || !name || !campus) return;
@@ -272,7 +303,12 @@ useEffect(() => {
     setIsModalVisible(false);
 
     if (!date || selectedSlots.length === 0 || !roomId) {
-      alert("Invalid booking data.");
+      // alert("Invalid booking data.");
+      toast({
+        title: "Invalid Booking",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -419,9 +455,17 @@ useEffect(() => {
               Select Slots
             </h2>
             <div className="grid grid-cols-4 gap-2">
+              {/* # reset selection state button */}
+              <button
+                className="col-span-4 px-3 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 ml-auto"
+                onClick={() => setSelectedSlots([])}
+              >
+                Reset
+              </button>
+              {/* # render slots */}
               {Array.from({ length: 16 }, (_, i) => i + 1).map((slot) => {
                 const isAvailable = availableSlots.includes(slot);
-                const isSelected = selectedSlots.includes(slot);
+                const isSelected = (startSession && endSession) ? (slot >= startSession && slot <= endSession) : false;
 
                 return (
                   <button
