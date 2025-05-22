@@ -22,15 +22,6 @@ const api = axios.create({
   // httpsAgent: new Agent({ rejectUnauthorized: false }),
 });
 
-// Add auth token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 // Function to get all room schedules
 export const getAllRoomSchedules = async () => {
   const response = await api.get("/roomschedules");
