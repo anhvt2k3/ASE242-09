@@ -14,10 +14,11 @@ if (process.env.NODE_ENV !== "production" && !localStorage.getItem("token")) {
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: API_BASE_URL+"/api",
+  headers: 
+      {
+        "Content-Type": "application/json",
+      },
   withCredentials: true,
   // httpsAgent: new Agent({ rejectUnauthorized: false }),
 });
