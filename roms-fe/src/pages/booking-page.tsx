@@ -639,14 +639,9 @@ export default function BookingPage() {
         name,
         building,
         campus,
-        roomId,
-        subjectId: 1,
-        courseCode,
-        courseName,
-        description,
+        subjectCode: courseCode,
         startSession,
         endSession,
-        autoToggle,
       });
 
       alert("Room booking successful!");
