@@ -37,19 +37,38 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button
+          variant="ghost"
+          className="relative flex items-center space-x-2 p-1"
+        >
           <Avatar className="h-8 w-8">
             <AvatarImage src={user?.displayName || "User"} />
             <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
           </Avatar>
+          <span className="text-sm text-muted-foreground">
+            {user
+              ? user.role
+                ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+                : "Unknown"
+              : "Guest"}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.displayName || user?.username || "User"}</p>
+            <p className="text-sm font-medium leading-none">
+              {user?.displayName || user?.username || "User"}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.username || ""}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user
+                ? user.role
+                  ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+                  : "Unknown"
+                : "Guest"}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -75,7 +94,10 @@ export function UserNav() {
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
+        <DropdownMenuItem
+          onClick={handleLogout}
+          disabled={logoutMutation.isPending}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
