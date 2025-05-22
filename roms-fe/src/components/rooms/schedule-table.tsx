@@ -15,7 +15,7 @@ interface ScheduleTableProps {
   weekDates: Date[];
   weekStart: Date;
   weekEnd: Date;
-  onBookRoom: (roomId: string, date: string) => void;
+  onBookRoom: (roomId: string, date: string, building: string) => void;
 }
 
 export function ScheduleTable({
@@ -88,7 +88,7 @@ function DailyScheduleTable({
 }: {
   rooms: RoomWithSchedule[];
   filters: RoomFilters;
-  onBookRoom: (roomId: string, date: string) => void;
+  onBookRoom: (roomId: string, date: string, building: string) => void;
 }) {
   const { user } = useAuth();
   console.log("rooms", rooms);
@@ -112,7 +112,7 @@ function DailyScheduleTable({
                 "slot6",
               ].includes(slot.id);
             } else if (filters.session === "afternoon") {
-              return ["slot7", "slot8", "slot9", "slot10", "slot11"].includes(
+              return ["slot7", "slot8", "slot9", "slot10", "slot11", "slot12", "slot13", "slot14", "slot15", "slot16"].includes(
                 slot.id
               );
             }
@@ -207,7 +207,7 @@ function DailyScheduleTable({
                       </div>
                     ) : user?.role == "lecturer" ? (
                       <button
-                        onClick={() => onBookRoom(room.id, filters.date)}
+                        onClick={() => onBookRoom(room.roomNumber, filters.date, room.building)}
                         className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
                       >
                         <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
@@ -243,7 +243,7 @@ function WeeklyScheduleTable({
 }: {
   rooms: RoomWithSchedule[];
   weekDates: Date[];
-  onBookRoom: (roomId: string, date: string) => void;
+  onBookRoom: (roomId: string, date: string, building: string) => void;
 }) {
   const { user } = useAuth();
 
@@ -314,7 +314,7 @@ function WeeklyScheduleTable({
                       </div>
                     ) : user?.role == "lecturer" ? (
                       <button
-                        onClick={() => onBookRoom(room.id, dayStr)}
+                        onClick={() => onBookRoom(room.roomNumber, dayStr, room.building)}
                         className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
                       >
                         <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
