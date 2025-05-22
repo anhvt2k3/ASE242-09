@@ -8,10 +8,17 @@ export const getRoomScheduleForTimeAndDay = (
 ) => {
   const [timeSlotStart, timeSlotEnd] = timeSlot.split("-");
 
-  return room.schedules.find(
-    (schedule) =>
+  const timeSlotStartHour = parseFloat(timeSlotStart.split(":")[0]);
+  const timeSlotEndHour = parseFloat(timeSlotEnd.split(":")[0]) + 1;
+
+  return room.schedules.find((schedule) => {
+    const scheduleStartHour = parseFloat(schedule.startTime.split(":")[0]);
+    const scheduleEndHour = parseFloat(schedule.endTime.split(":")[0]) - 0.1;
+
+    return (
       schedule.day === day &&
-      timeSlotStart < schedule.endTime &&
-      timeSlotEnd > schedule.startTime
-  );
+      timeSlotStartHour < scheduleEndHour &&
+      timeSlotEndHour > scheduleStartHour
+    );
+  });
 };

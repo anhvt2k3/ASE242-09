@@ -89,6 +89,7 @@ function DailyScheduleTable({
   onBookRoom: (roomId: string, date: string) => void;
 }) {
   const { user } = useAuth();
+  console.log("rooms", rooms);
 
   return (
     <table className="w-full border-collapse">
@@ -100,9 +101,18 @@ function DailyScheduleTable({
           {TIME_SLOTS.filter((slot) => {
             // Filter slots based on session if specified
             if (filters.session === "morning") {
-              return ["slot1", "slot2", "slot3"].includes(slot.id);
+              return [
+                "slot1",
+                "slot2",
+                "slot3",
+                "slot4",
+                "slot5",
+                "slot6",
+              ].includes(slot.id);
             } else if (filters.session === "afternoon") {
-              return ["slot4", "slot5", "slot6"].includes(slot.id);
+              return ["slot7", "slot8", "slot9", "slot10", "slot11"].includes(
+                slot.id
+              );
             }
             return true;
           }).map((slot) => (
@@ -124,9 +134,22 @@ function DailyScheduleTable({
             {(() => {
               const timeSlots = TIME_SLOTS.filter((slot) => {
                 if (filters.session === "morning") {
-                  return ["slot1", "slot2", "slot3"].includes(slot.id);
+                  return [
+                    "slot1",
+                    "slot2",
+                    "slot3",
+                    "slot4",
+                    "slot5",
+                    "slot6",
+                  ].includes(slot.id);
                 } else if (filters.session === "afternoon") {
-                  return ["slot4", "slot5", "slot6"].includes(slot.id);
+                  return [
+                    "slot7",
+                    "slot8",
+                    "slot9",
+                    "slot10",
+                    "slot11",
+                  ].includes(slot.id);
                 }
                 return true;
               });
@@ -139,6 +162,8 @@ function DailyScheduleTable({
                   slot.value,
                   filters.date
                 );
+
+                console.log(schedule);
                 let colspan = 1;
                 let j = i + 1;
 
@@ -238,9 +263,17 @@ function WeeklyScheduleTable({
             <td className="p-3">{room.building}</td>
             {weekDates.map((date) => {
               const dayStr = format(date, "yyyy-MM-dd");
-              const daySchedules = room.schedules.filter(
-                (schedule) => schedule.day === dayStr
-              );
+              const daySchedules = room.schedules
+                .filter((schedule) => schedule.day === dayStr)
+                .sort((a, b) => {
+                  // Convert time strings to minutes for easy comparison
+                  const getMinutes = (timeStr) => {
+                    const [hours, minutes] = timeStr.split(":").map(Number);
+                    return hours * 60 + minutes;
+                  };
+
+                  return getMinutes(a.startTime) - getMinutes(b.startTime);
+                });
 
               return (
                 <td
