@@ -462,7 +462,7 @@ export default function BookingPage() {
     const fetchBuildings = async () => {
       try {
         const res = await apiRequest(
-          "POST",
+          "GET",
           `/api/roomschedules/buildingByCampus?campus=${campus}`
         );
         const data = await res.json();
@@ -485,7 +485,7 @@ export default function BookingPage() {
     const fetchRooms = async () => {
       try {
         const res = await apiRequest(
-          "POST",
+          "GET",
           `/api/roomschedules/nameByBuilding?building=${building}&campus=${campus}`
         );
         const data = await res.json();
@@ -537,7 +537,7 @@ export default function BookingPage() {
     try {
       // 2. Check lecturer (user) availability
       const lecturerRes = await apiRequest(
-        "POST",
+        "GET",
         `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
       );
       const lecturerData = await lecturerRes.json();
@@ -564,7 +564,7 @@ export default function BookingPage() {
       try {
         const formattedDate = date.format("YYYY-MM-DD");
         const res = await apiRequest(
-          "POST",
+          "GET",
           `/api/roomschedules/available/${formattedDate}?campus=${campus}&name=${encodeURIComponent(
             name
           )}`
@@ -595,7 +595,7 @@ export default function BookingPage() {
       setLoadingCourseName(true);
       try {
         const res = await apiRequest(
-          "POST",
+          "GET",
           `/api/roomschedules/getsubject/${encodeURIComponent(
             courseCode.trim()
           )}`
