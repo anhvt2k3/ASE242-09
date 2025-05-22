@@ -18,10 +18,11 @@ export async function apiRequest(
   const res = await fetch(`${env.VITE_BE_DOMAIN}${url}`, {
     method,
     headers: 
-        data ? {
+        {
           "Content-Type": "application/json",
-          // "ngrok-skip-browser-warning": "true",
-        } : {},
+          "X-Custom-Header": "force-preflight",
+          "ngrok-skip-browser-warning": "true",
+        },
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });

@@ -51,13 +51,15 @@ export function ScheduleTable({
           <div className="flex justify-center items-center p-12">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
-        ) : !rooms?.length ? (
+        ) :
+         !rooms?.length ? (
           <div className="text-center p-12">
             <h3 className="text-lg text-muted-foreground font-medium">
               No schedule found
             </h3>
           </div>
-        ) : (
+        ) :
+         (
           <div className="overflow-x-auto">
             {filters.period === "day" ? (
               <DailyScheduleTable
@@ -149,6 +151,11 @@ function DailyScheduleTable({
                     "slot9",
                     "slot10",
                     "slot11",
+                    "slot12",
+                    "slot13",
+                    "slot14",
+                    "slot15",
+                    "slot16",
                   ].includes(slot.id);
                 }
                 return true;
@@ -198,7 +205,7 @@ function DailyScheduleTable({
                           {schedule.lecturer.name}
                         </span>
                       </div>
-                    ) : (
+                    ) : user?.role == "lecturer" ? (
                       <button
                         onClick={() => onBookRoom(room.id, filters.date)}
                         className="w-full h-full py-2 hover:bg-green-100 rounded-md transition-colors group"
@@ -211,6 +218,10 @@ function DailyScheduleTable({
                           <span className="text-green-600 text-xs">Book</span>
                         </div>
                       </button>
+                    ) : (
+                      <div className="text-center text-xs text-muted-foreground pt-4">
+                        No Session
+                      </div>
                     )}
                   </td>
                 );

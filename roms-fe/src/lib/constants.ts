@@ -19,4 +19,9 @@ export const TIME_SLOTS = [
   { id: "slot9", label: "15:00 - 15:50", value: "15:00-15:50" },
   { id: "slot10", label: "16:00 - 16:50", value: "16:00-16:50" },
   { id: "slot11", label: "17:00 - 17:50", value: "17:00-17:50" },
+  { id: "slot12", label: "18:00 - 18:50", value: "18:00-18:50" },
+  { id: "slot13", label: "19:00 - 19:50", value: "19:00-19:50" },
+  { id: "slot14", label: "20:00 - 20:50", value: "20:00-20:50" },
+  { id: "slot15", label: "21:00 - 21:50", value: "21:00-21:50" },
+  { id: "slot16", label: "22:00 - 22:50", value: "22:00-22:50" },
 ];

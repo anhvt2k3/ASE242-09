@@ -92,7 +92,7 @@ export default function HomePage() {
         console.error("Error fetching schedules:", error);
         return [];
       }
-    },
+    }
   });
   
   // Existing handlers remain the same
