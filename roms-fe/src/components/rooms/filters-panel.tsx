@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 
-import { BUILDINGS, ROOM_TYPES } from "@/lib/constants";
+import { apiRequest } from "@/lib/queryClient";
+import { BUILDINGS, CAMPUSES, ROOM_TYPES } from "@/lib/constants";
 import { RoomFilters } from "@/types/rooms";
 
 interface FiltersPanelProps {
@@ -38,6 +40,23 @@ export function FiltersPanel({
   onMySchedulesToggle,
   onNavigateWeek,
 }: FiltersPanelProps) {
+  const [buildings, setBuildings] = useState<string[]>(BUILDINGS);
+
+  useEffect(() => {
+    const fetchBuildings = async () => {
+      try {
+        const res = await apiRequest("GET", "/api/rooms/buildings");
+        const data = await res.json();
+        setBuildings(data);
+      } catch (error) {
+        console.error("Failed to fetch buildings", error);
+        setBuildings(BUILDINGS); // Fallback to default buildings
+      }
+    };
+
+    fetchBuildings();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -45,6 +64,26 @@ export function FiltersPanel({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Campus Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Campus</label>
+            <Select
+              value={filters.type || "all"}
+              onValueChange={(value) => onFilterChange("type", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Campuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Campuses</SelectItem>
+                {CAMPUSES.map((campus) => (
+                  <SelectItem key={campus} value={campus}>
+                    {campus}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           {/* Building Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Building</label>
@@ -57,30 +96,9 @@ export function FiltersPanel({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Buildings</SelectItem>
-                {BUILDINGS.map((building) => (
+                {buildings.map((building) => (
                   <SelectItem key={building} value={building}>
                     {building}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Room Type Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Room Type</label>
-            <Select
-              value={filters.type}
-              onValueChange={(value) => onFilterChange("type", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {ROOM_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -17,6 +17,8 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    "X-Custom-Header": "force-preflight",
+    "ngrok-skip-browser-warning": "true",
   },
   withCredentials: true,
   // httpsAgent: new Agent({ rejectUnauthorized: false }),
