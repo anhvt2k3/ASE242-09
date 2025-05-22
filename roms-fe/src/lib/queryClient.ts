@@ -17,7 +17,7 @@ export async function apiRequest(
 ): Promise<Response> {
   const res = await fetch(`${env.VITE_BE_DOMAIN}${url}`, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: method != 'GET' ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -32,7 +32,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const res = await fetch(env.VITE_BE_DOMAIN+queryKey[0] as string, {
       credentials: "include",
     });
 

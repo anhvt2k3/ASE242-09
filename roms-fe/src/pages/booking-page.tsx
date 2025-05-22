@@ -535,7 +535,7 @@ useEffect(() => {
   try {
     // 2. Check lecturer (user) availability
     const lecturerRes = await apiRequest(
-      "POST",
+      "GET",
       `/api/roomschedules/isAvailable?date=${formattedDate}&startSession=${startSession}&endSession=${endSession}`
     );
     const lecturerData = await lecturerRes.json();

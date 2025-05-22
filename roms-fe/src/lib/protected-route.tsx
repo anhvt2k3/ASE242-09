@@ -28,6 +28,13 @@ export function ProtectedRoute({
       </Route>
     );
   }
+  else if (user.role !== "lecturer") {
+    return (
+      <Route path={path}>
+        <Redirect to="/" />
+      </Route>
+    );
+  }
 
   return <Route path={path} component={Component} />;
 }
