@@ -133,7 +133,7 @@ export default function HomePage() {
     const confirmed = window.confirm("This is an irreversible action! Are you sure you want to delete this schedule?");
     if (!confirmed) return;
     try {
-      await apiRequest("DELETE", `/api/roomschedules/${scheduleid}`);
+      await apiRequest("DELETE", `/api/roomschedules/deletebooking?id=${scheduleid}`);
       toast({
         title: "Success",
         description: "Schedule deleted successfully.",
