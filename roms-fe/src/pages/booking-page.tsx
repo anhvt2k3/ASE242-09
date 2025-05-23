@@ -192,6 +192,7 @@ export default function BookingPage() {
     const roomParam = searchParams.get("roomId");
 
     if (dateParam) {
+      console.log("Date param:", dateParam);
       const parsedDate = dayjs(dateParam, "YYYY-MM-DD");
       if (parsedDate.isValid()) setDate(parsedDate);
     }

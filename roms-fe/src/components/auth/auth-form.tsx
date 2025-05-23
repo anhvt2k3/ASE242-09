@@ -128,7 +128,7 @@ export function AuthForm() {
       { ...apiData, endpoint },
       {
         onSuccess: () => {
-          navigate("/");
+          navigate("/auth");
         },
       }
     );
@@ -155,7 +155,7 @@ export function AuthForm() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="register">Register</TabsTrigger>
         </TabsList>

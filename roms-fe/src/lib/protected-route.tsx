@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
+import { toast } from "@/hooks/use-toast";
 
 export function ProtectedRoute({
   path,
@@ -22,6 +23,11 @@ export function ProtectedRoute({
   }
 
   if (!user) {
+      toast({
+        title: "Please log in to access this feature.",
+        description: `This feature is only available to verfied users.`,
+        variant: "default",
+      });
     return (
       <Route path={path}>
         <Redirect to="/auth" />
@@ -29,6 +35,11 @@ export function ProtectedRoute({
     );
   }
   else if (user.role !== "lecturer") {
+      toast({
+        title: "You are not authorized to access this feature.",
+        description: `You are not authorized to access this feature.`,
+        variant: "destructive",
+      });
     return (
       <Route path={path}>
         <Redirect to="/" />

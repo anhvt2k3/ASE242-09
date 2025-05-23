@@ -281,12 +281,15 @@ function WeeklyScheduleTable({
             <th
               key={format(date, "yyyy-MM-dd")}
               className={cn(
-                "p-3 text-center font-medium min-w-[150px]",
-                isSameDay(date, new Date()) && "bg-primary/5"
+              "p-3 text-center font-medium min-w-[150px] cursor-pointer hover:bg-muted/50 transition-colors",
+              isSameDay(date, new Date()) && "bg-primary/5"
               )}
+              onClick={() => onBookRoom("", format(date, "yyyy-MM-dd"), "")}
             >
+              <button className="w-full h-full text-left">
               <div>{format(date, "EEE")}</div>
               <div className="text-xs">{format(date, "MMM d")}</div>
+              </button>
             </th>
           ))}
         </tr>
@@ -333,6 +336,7 @@ function WeeklyScheduleTable({
                         <div className="text-muted-foreground">
                           {schedule.lecturer.name}
                         </div>
+                        {/* Only show for its creator */}
                         {schedule.lecturerId === user?.id?.toString() && (
                           <div className="absolute top-1 right-1 group">
                           <button
