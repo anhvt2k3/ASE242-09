@@ -10,6 +10,9 @@ import { filterRoomSchedules, transformBackendData } from "@/lib/api-module";
 import { FiltersPanel } from "@/components/rooms/filters-panel";
 import { ScheduleTable } from "@/components/rooms/schedule-table";
 import { Navbar } from "@/components/layout/navbar";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
+import { RelationalQueryBuilder } from "drizzle-orm/mysql-core/query-builders/query";
 
 export default function HomePage() {
   // Existing state and hooks
@@ -126,6 +129,29 @@ export default function HomePage() {
     }
   };
 
+  const handleDeleteSchedule = async (scheduleid: string) => {
+    // show confirmation dialog
+    const confirmed = window.confirm("This is an irreversible action! Are you sure you want to delete this schedule?");
+    if (!confirmed) return;
+    try {
+      await apiRequest("DELETE", `/api/roomschedules/deletebooking?id=${scheduleid}`);
+      // Refetch the data after deletion
+      await queryClient.invalidateQueries({ queryKey: ["rooms", filters, weekStart] });
+      toast({
+        title: "Success",
+        description: "Schedule deleted successfully.",
+        variant: "default",
+      });
+    } catch (error) { 
+      console.error("Error deleting schedule:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete schedule.",
+        variant: "destructive",
+      });
+    }
+  }
+
   
   const navigateWeek = (direction: 'prev' | 'next') => {
     const days = direction === 'prev' ? -7 : 7;
@@ -168,6 +194,7 @@ export default function HomePage() {
           weekStart={weekStart}
           weekEnd={weekEnd}
           onBookRoom={handleBookRoom}
+          onDeleteSchedule={handleDeleteSchedule}
         />
       </div>
     </div>

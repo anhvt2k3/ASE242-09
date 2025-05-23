@@ -16,6 +16,7 @@ interface ScheduleTableProps {
   weekStart: Date;
   weekEnd: Date;
   onBookRoom: (roomId: string, date: string, building: string) => void;
+  onDeleteSchedule: (scheduleId: string) => void;
 }
 
 export function ScheduleTable({
@@ -26,6 +27,7 @@ export function ScheduleTable({
   weekStart,
   weekEnd,
   onBookRoom,
+  onDeleteSchedule,
 }: ScheduleTableProps) {
   return (
     <Card>
@@ -66,12 +68,14 @@ export function ScheduleTable({
                 rooms={rooms}
                 filters={filters}
                 onBookRoom={onBookRoom}
+                onDeleteSchedule={onDeleteSchedule}
               />
             ) : (
               <WeeklyScheduleTable
                 rooms={rooms}
                 weekDates={weekDates}
                 onBookRoom={onBookRoom}
+                onDeleteSchedule={onDeleteSchedule}
               />
             )}
           </div>
@@ -85,10 +89,12 @@ function DailyScheduleTable({
   rooms,
   filters,
   onBookRoom,
+  onDeleteSchedule,
 }: {
   rooms: RoomWithSchedule[];
   filters: RoomFilters;
   onBookRoom: (roomId: string, date: string, building: string) => void;
+  onDeleteSchedule: (scheduleId: string) => void;
 }) {
   const { user } = useAuth();
   console.log("rooms", rooms);
@@ -192,7 +198,7 @@ function DailyScheduleTable({
                   <td
                     key={`${room.id}-${slot.id}`}
                     colSpan={colspan}
-                    className={`p-3 text-center border border-md ${
+                    className={`p-3 relative text-center border border-md ${
                       schedule ? "bg-primary/10" : "bg-green-50/30"
                     }`}
                   >
@@ -204,6 +210,22 @@ function DailyScheduleTable({
                         <span className="text-xs text-muted-foreground">
                           {schedule.lecturer.name}
                         </span>
+                        { (schedule.lecturerId === user?.id?.toString()) && 
+                            (
+                            <div className="absolute top-1 right-1 group">
+                              <button
+                                onClick={() => onDeleteSchedule(schedule.id)}
+                                className="text-muted-foreground hover:text-red-500 transition-colors"
+                              >
+                                x
+                              </button>
+                              {/* Tooltip */}
+                              <div className="absolute -top-6 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                Delete schedule
+                              </div>
+                            </div>
+                            )
+                        }
                       </div>
                     ) : user?.role == "lecturer" ? (
                       <button
@@ -240,10 +262,12 @@ function WeeklyScheduleTable({
   rooms,
   weekDates,
   onBookRoom,
+  onDeleteSchedule,
 }: {
   rooms: RoomWithSchedule[];
   weekDates: Date[];
   onBookRoom: (roomId: string, date: string, building: string) => void;
+  onDeleteSchedule: (scheduleId: string) => void;
 }) {
   const { user } = useAuth();
 
@@ -294,43 +318,57 @@ function WeeklyScheduleTable({
                     isSameDay(date, new Date()) && "bg-primary/5"
                   )}
                 >
-                  <div className="min-h-[100px]">
+                    <div className="min-h-[100px] relative">
                     {daySchedules.length > 0 ? (
                       <div className="space-y-1">
-                        {daySchedules.map((schedule) => (
-                          <div
-                            key={schedule.id}
-                            className="bg-primary/10 p-2 rounded text-xs"
+                      {daySchedules.map((schedule) => (
+                        <div
+                        key={schedule.id}
+                        className="bg-primary/10 p-2 rounded text-xs relative"
+                        >
+                        <div className="font-medium">
+                          {schedule.startTime} - {schedule.endTime}
+                        </div>
+                        <div>{schedule.subject}</div>
+                        <div className="text-muted-foreground">
+                          {schedule.lecturer.name}
+                        </div>
+                        {schedule.lecturerId === user?.id?.toString() && (
+                          <div className="absolute top-1 right-1 group">
+                          <button
+                            onClick={() => onDeleteSchedule(schedule.id)}
+                            className="text-muted-foreground hover:text-red-500 transition-colors"
                           >
-                            <div className="font-medium">
-                              {schedule.startTime} - {schedule.endTime}
-                            </div>
-                            <div>{schedule.subject}</div>
-                            <div className="text-muted-foreground">
-                              {schedule.lecturer.name}
-                            </div>
+                            x
+                          </button>
+                          {/* Tooltip */}
+                          <div className="absolute -top-6 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                            Delete schedule
                           </div>
-                        ))}
+                          </div>
+                        )}
+                        </div>
+                      ))}
                       </div>
                     ) : user?.role == "lecturer" ? (
                       <button
-                        onClick={() => onBookRoom(room.roomNumber, dayStr, room.building)}
-                        className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
+                      onClick={() => onBookRoom(room.roomNumber, dayStr, room.building)}
+                      className="flex flex-col items-center justify-center w-full h-full min-h-[100px] rounded-md hover:bg-green-100 transition-colors group"
                       >
-                        <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
-                          Available
-                        </span>
-                        <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
-                          <PlusCircle className="h-3 w-3" />
-                          <span>Book</span>
-                        </div>
+                      <span className="text-green-600 text-xs font-medium group-hover:text-green-700">
+                        Available
+                      </span>
+                      <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
+                        <PlusCircle className="h-3 w-3" />
+                        <span>Book</span>
+                      </div>
                       </button>
                     ) : (
                       <div className="text-center text-xs text-muted-foreground pt-4">
-                        No Session
+                      No Session
                       </div>
                     )}
-                  </div>
+                    </div>
                 </td>
               );
             })}
