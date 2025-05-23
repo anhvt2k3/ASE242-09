@@ -1,5 +1,7 @@
 export const BUILDINGS = ["A1", "A2", "B1", "B2", "C1", "C2", "H1", "H2", "H3"];
 
+export const CAMPUSES = ["1", "2"];
+
 export const ROOM_TYPES = [
   "Lecture Hall",
   "Laboratory",

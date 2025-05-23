@@ -99,7 +99,7 @@ function DailyScheduleTable({
         <tr className="bg-muted/50">
           <th className="p-3 text-left font-medium">Room</th>
           <th className="p-3 text-left font-medium">Building</th>
-          <th className="p-3 text-left font-medium">Type</th>
+          <th className="p-3 text-left font-medium">Campus</th>
           {TIME_SLOTS.filter((slot) => {
             // Filter slots based on session if specified
             if (filters.session === "morning") {
