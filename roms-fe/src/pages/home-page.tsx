@@ -10,8 +10,9 @@ import { filterRoomSchedules, transformBackendData } from "@/lib/api-module";
 import { FiltersPanel } from "@/components/rooms/filters-panel";
 import { ScheduleTable } from "@/components/rooms/schedule-table";
 import { Navbar } from "@/components/layout/navbar";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
+import { RelationalQueryBuilder } from "drizzle-orm/mysql-core/query-builders/query";
 
 export default function HomePage() {
   // Existing state and hooks
@@ -134,6 +135,8 @@ export default function HomePage() {
     if (!confirmed) return;
     try {
       await apiRequest("DELETE", `/api/roomschedules/deletebooking?id=${scheduleid}`);
+      // Refetch the data after deletion
+      await queryClient.invalidateQueries({ queryKey: ["rooms", filters, weekStart] });
       toast({
         title: "Success",
         description: "Schedule deleted successfully.",
