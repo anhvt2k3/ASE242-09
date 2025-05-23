@@ -37,7 +37,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://profound-moccasin-composed.ngrok-free.app',
+        target: 'https://localhost:7288',
         changeOrigin: true,
         secure: false, // Bỏ qua xác minh chứng chỉ SSL
       }
