@@ -17,6 +17,7 @@ interface ScheduleTableProps {
   weekEnd: Date;
   onBookRoom: (roomId: string, date: string, building: string) => void;
   onDeleteSchedule: (scheduleId: string) => void;
+  onFilterChange: (key: string, value: string) => void;
 }
 
 export function ScheduleTable({
@@ -28,6 +29,7 @@ export function ScheduleTable({
   weekEnd,
   onBookRoom,
   onDeleteSchedule,
+  onFilterChange,
 }: ScheduleTableProps) {
   return (
     <Card>
@@ -76,6 +78,7 @@ export function ScheduleTable({
                 weekDates={weekDates}
                 onBookRoom={onBookRoom}
                 onDeleteSchedule={onDeleteSchedule}
+                onFilterChange={onFilterChange}
               />
             )}
           </div>
@@ -263,11 +266,13 @@ function WeeklyScheduleTable({
   weekDates,
   onBookRoom,
   onDeleteSchedule,
+  onFilterChange,
 }: {
   rooms: RoomWithSchedule[];
   weekDates: Date[];
   onBookRoom: (roomId: string, date: string, building: string) => void;
   onDeleteSchedule: (scheduleId: string) => void;
+  onFilterChange: (key: string, value: string) => void;
 }) {
   const { user } = useAuth();
 
@@ -284,7 +289,7 @@ function WeeklyScheduleTable({
               "p-3 text-center font-medium min-w-[150px] cursor-pointer hover:bg-muted/50 transition-colors",
               isSameDay(date, new Date()) && "bg-primary/5"
               )}
-              onClick={() => onBookRoom("", format(date, "yyyy-MM-dd"), "")}
+              onClick={() => {onFilterChange("date", format(date, "yyyy-MM-dd")); onFilterChange("period", "day")}} // Assuming you have a setFilters function to update the filters
             >
               <button className="w-full h-full text-left">
               <div>{format(date, "EEE")}</div>

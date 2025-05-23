@@ -195,6 +195,7 @@ export default function HomePage() {
           weekEnd={weekEnd}
           onBookRoom={handleBookRoom}
           onDeleteSchedule={handleDeleteSchedule}
+          onFilterChange={handleFilterChange}
         />
       </div>
     </div>
