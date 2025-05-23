@@ -150,7 +150,7 @@ export default function BookingPage() {
         // );
         toast({
           title: "Booking Conflict",
-          description: "You are already booked during these sessions. Please choose different slots.",
+          description: "You are already booked during these sessions. Please choose different time slots.",
           variant: "destructive",
         });
         return;
@@ -503,7 +503,19 @@ export default function BookingPage() {
                 className="w-full"
                 options={suggestions}
                 value={courseCode}
-                onChange={setCourseCode}
+                onChange={
+                  (value) => {
+                    try {
+                      const cleasedValue = InputValidationService.cleanseInput(value);
+                      setCourseCode(cleasedValue);
+                    } catch {
+                      toast({
+                        title: "Invalid Input",
+                        description: "Please enter a valid course code.",
+                        variant: "destructive",
+                      })
+                    }
+                  }}
                 placeholder="e.g., CO2001"
               />
             </div>

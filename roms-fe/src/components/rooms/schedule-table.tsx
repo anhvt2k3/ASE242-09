@@ -289,7 +289,11 @@ function WeeklyScheduleTable({
               "p-3 text-center font-medium min-w-[150px] cursor-pointer hover:bg-muted/50 transition-colors",
               isSameDay(date, new Date()) && "bg-primary/5"
               )}
-              onClick={() => {onFilterChange("date", format(date, "yyyy-MM-dd")); onFilterChange("period", "day")}} // Assuming you have a setFilters function to update the filters
+              onClick={() => {
+                // Weekday as Day filter buttons
+                onFilterChange("date", format(date, "yyyy-MM-dd")); onFilterChange("period", "day")}
+                        
+            }
             >
               <button className="w-full h-full text-left">
               <div>{format(date, "EEE")}</div>

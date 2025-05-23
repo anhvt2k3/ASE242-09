@@ -18,6 +18,8 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { BUILDINGS, CAMPUSES, ROOM_TYPES } from "@/lib/constants";
 import { RoomFilters } from "@/types/rooms";
+import { InputValidationService } from "@/lib/inputValidator";
+import { toast } from "@/hooks/use-toast";
 
 interface FiltersPanelProps {
   filters: RoomFilters;
@@ -114,7 +116,18 @@ export function FiltersPanel({
                 placeholder="Search room number..."
                 className="pl-8"
                 value={filters.roomNumber}
-                onChange={(e) => onFilterChange("roomNumber", e.target.value)}
+                onChange={(e) => {
+                  try {
+                    const value = InputValidationService.cleanseInput(e.target.value);
+                    onFilterChange("roomNumber", value);
+                  } catch (error) {
+                    toast({
+                      title: "Invalid input",
+                      description: "Please enter a valid room number.",
+                      variant: "destructive",
+                    })
+                  }
+                }}
               />
             </div>
           </div>
